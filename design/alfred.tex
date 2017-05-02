@@ -1,0 +1,80 @@
+\documentclass[12pt]{article}
+
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{float}
+\usepackage{hyperref}
+
+
+\title{Alfred Design Documentation}
+\author{Mayank Sindwani}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \maketitle
+    \includegraphics[scale=0.2]{images/logo.png}
+    \tableofcontents
+\end{titlepage}
+
+\section{Scoping}
+
+\subsection{Problem Statement}
+
+Online tutorials generally offer step-by-step solutions to accomplishing specific tasks. Users often read and perform steps concurrently as opposed to reviewing the tutorial and following the instructions from memory. As a result, a lot of time is spent context-switching between executing tasks and reading the instructions. Further more, switching between performing and reviewing a step is more difficult to do when the task is physically demanding.
+
+
+\subsection{Purpose Statement}
+
+In addition to keeping track of tutorials, a comprehensive interface that lends itself to semi-automated guidance through the tutorial would be beneficial to many users. Ideally the user would have limited physical interaction with the device in order to retain focus on executing an instruction. Alfred aims to present a user interface geared towards a design that maximizes productivity when reviewing and executing a tutorial.  
+
+\subsection{Stakeholders}
+
+Stakeholders include the owner and software developer Mayank Sindwani as well users willing to actively use the application. The owner will facilitate the design and development process while end users will continuously provide feedback during development.
+
+\subsection{Constraints}
+
+Alfred is subject to the following constraints:
+
+\begin{itemize}
+
+\item The software must operate under the functionality constraints of the android platform including limited file system access and memory.
+\item Resources saved and used by the software must fall within the constraints enforced by the user's operating system and machine.
+\item The software must not obstruct the methods by which a user may iterate through instructions manually
+
+\end{itemize}
+
+\section{Functional (Atomic) Requirements}
+
+Alfred aims to include the following top priority requirements as elicited from stakeholders:
+
+\begin{itemize}[noitemsep]
+\item The system should allow users to perform CRUD operations on tutorials
+\item The system should accept voice commands to navigate tutorials and instructions
+\end{itemize}
+
+Lower priority items include user preference configurations, export and import features, intelligent space usage, and data analysis.
+
+\section{Styleguide}
+
+Alfred follows Google's material design guidelines. See the \href{https://material.io/color/#!/?view.left=0&view.right=0&primary.color=455A64&secondary.color=80CBC4}{material styleguide} for colour scheme and accessibility details. The colour scheme is blue gray as the primary colour and teal as the secondary. Below are the colour hex codes used throughout the application:
+
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{5cm} |}
+    \hline
+     Color & Hex \\ \hline
+     Blue gray & {\color[RGB]{69,90,100} \#455a64} \\ \hline
+     Blue gray (dark) & {\color[RGB]{28,49,58} \#1c313a} \\ \hline
+     Blue gray (light) & {\color[RGB]{113,135,146} \#718792} \\ \hline
+     Teal & {\color[RGB]{128,203,196} \#80cbc4} \\
+     Teal (dark) & {\color[RGB]{79,154,148} \#4f9a94} \\
+     Teal (light) & {\color[RGB]{178,254,247} \#b2fef7} \\
+    \hline
+    \end{tabular}
+\end{center}
+
+The text colour on teal colours is black while blue gray colours use white text. The main application font used is DroidSans (Apache License).
+
+\end{document}
