@@ -2,6 +2,8 @@ package msindwan.alfred.views.tutorial;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -48,6 +50,8 @@ public class TutorialEditor extends AppCompatActivity {
 
         tab.setButtonOnClickListener(onTabClick);
         tab.setRemoveOnClickListener(onTabRemoveClick);
+        m_editorFormStepTitle.addTextChangedListener(onEditorFormStepTitleChanged);
+        m_editorFormStepDescription.addTextChangedListener(onEditorFormStepDescriptionChanged);
 
         m_tutorial.addStep(step);
         m_tab_layout.addView(tab);
@@ -119,6 +123,10 @@ public class TutorialEditor extends AppCompatActivity {
                 .setListener(null);
     }
 
+    public void onCreateStep(View view) { addStep(); }
+
+    public void onCancelEditor(View view) { finish(); }
+
     private View.OnClickListener onTabClick = new View.OnClickListener() {
         public void onClick(View v) {
             TutorialTab tab = (TutorialTab)(v.getParent()).getParent();
@@ -136,7 +144,32 @@ public class TutorialEditor extends AppCompatActivity {
         }
     };
 
-    public void onCreateStep(View view) { addStep(); }
+    private TextWatcher onEditorFormStepTitleChanged = new TextWatcher() {
 
-    public void onCancelEditor(View view) { finish(); }
+        @Override
+        public void afterTextChanged(Editable s) {}
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            m_tutorial.getStep(m_activeTab).setTitle(m_editorFormStepTitle.getText().toString());
+        }
+    };
+
+    private TextWatcher onEditorFormStepDescriptionChanged = new TextWatcher() {
+
+        @Override
+        public void afterTextChanged(Editable s) {}
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            m_tutorial.getStep(m_activeTab).setDescription(m_editorFormStepDescription.getText().toString());
+        }
+    };
+
 }

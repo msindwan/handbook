@@ -13,9 +13,20 @@ public class Tutorial {
     private ArrayList<TutorialStep> m_steps;
     private String m_name;
 
+    // Constructor.
     public Tutorial(String name) {
         m_name = name;
-        m_steps = new ArrayList<TutorialStep>();
+        m_steps = new ArrayList<>();
+    }
+
+    // Getter for the name.
+    public String getName() {
+        return m_name;
+    }
+
+    // Setter for the name.
+    public void setName(String name) {
+        m_name = name;
     }
 
     // Returns the number of steps in the tutorial.

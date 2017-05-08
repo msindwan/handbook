@@ -8,4 +8,5 @@
     <string name="enter_title">Enter the Title...</string>
     <string name="enter_description">Enter the Description...</string>
     <string name="add_image">Add Image</string>
+    <string name="remove_step">Remove Step</string>
 </resources>

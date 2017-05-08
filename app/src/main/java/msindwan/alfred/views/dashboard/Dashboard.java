@@ -48,7 +48,7 @@ public class Dashboard extends AppCompatActivity {
         });
     }
 
-    protected void createTutorial(View view) {
+    protected void onCreateTutorial(View view) {
         Intent intent = new Intent(this, TutorialEditor.class);
         startActivity(intent);
     }
