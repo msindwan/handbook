@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/tutorial_tab"
+        android:layout_weight="1"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:background="@drawable/circle"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#fff" />
+
+    <ImageButton
+        android:id="@+id/tutorial_remove_tab"
+        android:layout_width="25dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:scaleType="matrix"
+        android:tint="@android:color/holo_red_light"
+        app:srcCompat="@mipmap/ic_delete_forever_white_24dp" />
+
+</LinearLayout>
