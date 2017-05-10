@@ -2,6 +2,7 @@ package msindwan.alfred.views.tutorial;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -9,110 +10,165 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.Locale;
-import msindwan.alfred.R;
+
 import msindwan.alfred.models.Tutorial;
 import msindwan.alfred.models.TutorialStep;
+
+import msindwan.alfred.R;
 
 /**
  * Created by Mayank Sindwani on 2017-05-04.
  *
+ * TutorialEditor:
+ * Defines a view component for creating and editing tutorials.
  */
 public class TutorialEditor extends AppCompatActivity {
 
-    private ArrayList<TutorialTab> m_tabs;
     private Tutorial m_tutorial;
     private int m_activeTab;
 
+    // View components.
+    private ArrayList<TutorialTab> m_editorTabs;
+
     private EditText m_editorFormStepDescription;
     private EditText m_editorFormStepTitle;
-    private LinearLayout m_tab_layout;
+    private EditText m_editorTutorialName;
+
+    private LinearLayout m_editorTabLayout;
     private LinearLayout m_editorForm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tutorial_tutorial_editor);
-        init();
+        init(savedInstanceState);
     }
 
-    private void init() {
-        m_tutorial     = new Tutorial("New Tutorial");
-        m_tabs         = new ArrayList<>();
-        m_tab_layout   = (LinearLayout)findViewById(R.id.tutorial_editor_tab_layout);
-        m_editorForm   = (LinearLayout)findViewById(R.id.editor_form);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Save the state of the tutorial and active tab.
+        outState.putParcelable("tutorial", m_tutorial);
+        outState.putInt("activeTab", m_activeTab);
+        super.onSaveInstanceState(outState);
+    }
+
+    /**
+     * Initializes the component on mount.
+     */
+    private void init(Bundle savedInstanceState) {
+        // Initialize components.
+        m_editorTabs                = new ArrayList<>();
+        m_editorTabLayout           = (LinearLayout)findViewById(R.id.tutorial_editor_tab_layout);
+        m_editorForm                = (LinearLayout)findViewById(R.id.editor_form);
         m_editorFormStepDescription = (EditText)findViewById(R.id.editor_form_step_description);
-        m_editorFormStepTitle = (EditText)findViewById(R.id.editor_form_step_title);
-        m_activeTab    = 0;
+        m_editorFormStepTitle       = (EditText)findViewById(R.id.editor_form_step_title);
+        m_editorTutorialName        = (EditText)findViewById(R.id.tutorial_name);
 
-        TutorialStep step = new TutorialStep();
-        TutorialTab tab = new TutorialTab(this);
-        int tabIndex = m_tutorial.getNumSteps();
+        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
 
-        tab.setButtonOnClickListener(onTabClick);
-        tab.setRemoveOnClickListener(onTabRemoveClick);
-        m_editorFormStepTitle.addTextChangedListener(onEditorFormStepTitleChanged);
+        // Bind listeners.
         m_editorFormStepDescription.addTextChangedListener(onEditorFormStepDescriptionChanged);
+        m_editorFormStepTitle.addTextChangedListener(onEditorFormStepTitleChanged);
+        m_editorTutorialName.addTextChangedListener(onTutorialNameChanged);
 
-        m_tutorial.addStep(step);
-        m_tab_layout.addView(tab);
-        m_tabs.add(tab);
+        TutorialTab tab;
 
-        tab.setText(String.format(Locale.getDefault(), "%d", tabIndex + 1));
+        // Initialize the activity data or retrieve the saved state.
+        if(savedInstanceState == null || !savedInstanceState.containsKey("tutorial")) {
+            m_tutorial = new Tutorial();
+
+            // Add the initial step.
+            TutorialStep initialStep = new TutorialStep();
+            m_tutorial.addStep(initialStep);
+
+            m_activeTab = 0;
+            tab = addTab(m_activeTab);
+        } else {
+            m_tutorial = savedInstanceState.getParcelable("tutorial");
+
+            // TODO: Use a fallback instead of throwing an exception
+            if(m_tutorial == null) {
+                throw new RuntimeException();
+            }
+
+            for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
+                addTab(i);
+            }
+
+            m_activeTab = savedInstanceState.getInt("activeTab", 0);
+            tab = m_editorTabs.get(m_activeTab);
+        }
+
         tab.setBackgroundColour(R.color.colorSecondaryDark);
     }
 
-    private void addStep() {
-        TutorialStep step = new TutorialStep();
-        TutorialTab tab = new TutorialTab(this);
-        int tabIndex = m_tutorial.getNumSteps();
+    /**
+     * Adds a step to the tutorial.
+     * @return : The position of the step in the tutorial
+     */
+    private TutorialTab addTab(int tabIndex) {
+        TutorialTab newTab = new TutorialTab(this);
 
-        tab.setButtonOnClickListener(onTabClick);
-        tab.setRemoveOnClickListener(onTabRemoveClick);
+        // Add tab event listeners.
+        newTab.setButtonOnClickListener(onTabClick);
+        newTab.setRemoveOnClickListener(onTabRemoveClick);
 
-        m_tutorial.addStep(step);
-        m_tab_layout.addView(tab);
-        m_tabs.add(tab);
+        // Add the new step and the corresponding tab.
+        m_editorTabLayout.addView(newTab);
+        m_editorTabs.add(newTab);
 
-        tab.setText(String.format(Locale.getDefault(), "%d", tabIndex + 1));
-        setActiveTab(tabIndex);
+        newTab.setText(String.format(Locale.getDefault(), "%d", tabIndex + 1));
+        newTab.setBackgroundColour(R.color.colorPrimary);
+        return newTab;
     }
 
-    private void removeStep(TutorialTab tab) {
-        int index = m_tabs.indexOf(tab);
+    /**
+     * Removes the step corresponding to the tab.
+     * @param tabIndex : The step's tab position.
+     */
+    private void removeTab(int tabIndex) {
+        // Remove the tab.
+        m_editorTabLayout.removeView(m_editorTabs.get(tabIndex));
+        m_editorTabs.remove(tabIndex);
 
-        m_tab_layout.removeView(tab);
-        m_tutorial.removeStep(index);
-        m_tabs.remove(index);
-
-        for (int i = index; i < m_tabs.size(); i++) {
-            m_tabs.get(i).setText(String.format(Locale.getDefault(), "%d", i + 1));
+        // Update the tab step labels.
+        for (int i = tabIndex; i < m_editorTabs.size(); i++) {
+            m_editorTabs.get(i).setText(String.format(Locale.getDefault(), "%d", i + 1));
         }
 
-        if (index == m_activeTab) {
-            if (index == 0) {
-                setActiveTab(0);
-            } else {
-                setActiveTab(index - 1);
-            }
-        } else if (index < m_activeTab) {
+        // Update the active tab.
+        if (tabIndex == m_activeTab) {
+            setActiveTab(Math.min(0, tabIndex - 1));
+        } else if (tabIndex < m_activeTab) {
             m_activeTab--;
         }
     }
 
-    private void setActiveTab(int index) {
-        if (index == m_activeTab) return;
+    /**
+     * Sets the state of the specified tab to "active".
+     * @param tabIndex : The position of the tab
+     */
+    private void setActiveTab(int tabIndex) {
+        // If the tab is already active, don't do anything.
+        if (tabIndex == m_activeTab) return;
 
-        for (TutorialTab t : m_tabs) {
+        TutorialTab tab = m_editorTabs.get(tabIndex);
+
+        // Deactivate all tabs.
+        for (TutorialTab t : m_editorTabs) {
             t.setBackgroundColour(R.color.colorPrimary);
         }
-        TutorialTab tab = m_tabs.get(index);
-        tab.setBackgroundColour(R.color.colorSecondaryDark);
-        m_activeTab = index;
 
-        TutorialStep step = m_tutorial.getStep(index);
+        // Activate the specified tab and set the active tab.
+        tab.setBackgroundColour(R.color.colorSecondaryDark);
+        m_activeTab = tabIndex;
+
+        // Apply the step information to the form.
+        TutorialStep step = m_tutorial.getStep(tabIndex);
 
         m_editorForm.setAlpha(0f);
 
+        // Populate the form with the step information.
         m_editorFormStepTitle.setText(step.getTitle());
         m_editorFormStepDescription.setText(step.getDescription());
 
@@ -123,27 +179,66 @@ public class TutorialEditor extends AppCompatActivity {
                 .setListener(null);
     }
 
-    public void onCreateStep(View view) { addStep(); }
 
-    public void onCancelEditor(View view) { finish(); }
+    // Event handlers.
 
+    /**
+     * Handler to create a new step.
+     * @param view : The element.
+     */
+    public void onCreateStep(View view) {
+        // Create a new step.
+        int tabIndex = m_tutorial.getNumSteps();
+        m_tutorial.addStep(new TutorialStep());
+
+        // Add the corresponding tab and activate it.
+        addTab(tabIndex);
+        setActiveTab(tabIndex);
+    }
+
+    /**
+     * Handler to cancel creating or editing a tutorial.
+     * @param view : The element.
+     */
+    public void onCancelEditor(View view) {
+        finish();
+    }
+
+    /**
+     * Listener for tab clicks.
+     */
     private View.OnClickListener onTabClick = new View.OnClickListener() {
-        public void onClick(View v) {
-            TutorialTab tab = (TutorialTab)(v.getParent()).getParent();
-            setActiveTab(m_tabs.indexOf(tab));
-        }
-    };
 
-    private View.OnClickListener onTabRemoveClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (m_tabs.size() > 1) {
-                TutorialTab tab = (TutorialTab) (v.getParent()).getParent();
-                removeStep(tab);
-            }
+            TutorialTab tab = (TutorialTab)(v.getParent()).getParent();
+            setActiveTab(m_editorTabs.indexOf(tab));
         }
+
     };
 
+    /**
+     * Listener for removing tabs.
+     */
+    private View.OnClickListener onTabRemoveClick = new View.OnClickListener() {
+
+        @Override
+        public void onClick(View v) {
+            if (m_editorTabs.size() > 1) {
+                TutorialTab tab = (TutorialTab) (v.getParent()).getParent();
+                int tabIndex = m_editorTabs.indexOf(tab);
+
+                // Remove the step and the corresponding tab.
+                m_tutorial.removeStep(tabIndex);
+                removeTab(tabIndex);
+            }
+        }
+
+    };
+
+    /**
+     * Listener for step title changes.
+     */
     private TextWatcher onEditorFormStepTitleChanged = new TextWatcher() {
 
         @Override
@@ -158,6 +253,9 @@ public class TutorialEditor extends AppCompatActivity {
         }
     };
 
+    /**
+     * Listener for step description changes.
+     */
     private TextWatcher onEditorFormStepDescriptionChanged = new TextWatcher() {
 
         @Override
@@ -169,6 +267,23 @@ public class TutorialEditor extends AppCompatActivity {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             m_tutorial.getStep(m_activeTab).setDescription(m_editorFormStepDescription.getText().toString());
+        }
+    };
+
+    /**
+     * Listener for tutorial name changes.
+     */
+    private TextWatcher onTutorialNameChanged = new TextWatcher() {
+
+        @Override
+        public void afterTextChanged(Editable s) {}
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            m_tutorial.setName(m_editorTutorialName.getText().toString());
         }
     };
 

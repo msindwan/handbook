@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">Alfred</string>
     <string name="dashboard_title">Tutorials</string>
-    <string name="tutorial_editor_title">Edit Tutorial</string>
     <string name="cancel">Cancel</string>
     <string name="new_step">New Step</string>
     <string name="save">Save</string>
-    <string name="enter_title">Enter the Title...</string>
-    <string name="enter_description">Enter the Description...</string>
     <string name="add_image">Add Image</string>
     <string name="remove_step">Remove Step</string>
+    <string name="title_placeholder">Enter the Title...</string>
+    <string name="description_placeholder">Enter the Description...</string>
+    <string name="tutorial_name_placeholder">Tutorial Name...</string>
 </resources>

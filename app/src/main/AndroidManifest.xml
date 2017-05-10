@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/tutorial_editor_title"
+            android:theme="@style/AppTheme.NoActionBar"
             android:name=".views.tutorial.TutorialEditor">
         </activity>
     </application>

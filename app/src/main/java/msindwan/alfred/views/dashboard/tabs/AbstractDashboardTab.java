@@ -13,7 +13,7 @@ import msindwan.alfred.R;
 public abstract class AbstractDashboardTab extends Fragment {
 
     protected void populateTutorials(TableLayout table) {
-        for (int i = 0; i < 1; i++) {
+        /*for (int i = 0; i < 1; i++) {
             TableRow tutorialRow = new TableRow(this.getContext());
             tutorialRow.setBackgroundResource(R.drawable.row_divider);
             TutorialTableCell tutorialTableCell = new TutorialTableCell(this.getContext());
@@ -25,7 +25,7 @@ public abstract class AbstractDashboardTab extends Fragment {
 
             tutorialRow.addView(tutorialTableCell, params);
             table.addView(tutorialRow);
-        }
+        }*/
     }
 
 }
