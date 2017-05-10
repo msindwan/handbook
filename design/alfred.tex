@@ -5,6 +5,7 @@
 \usepackage{color}
 \usepackage{float}
 \usepackage{hyperref}
+\usepackage{pdfpages}
 
 
 \title{Alfred Design Documentation}
@@ -76,5 +77,16 @@ Alfred follows Google's material design guidelines. See the \href{https://materi
 \end{center}
 
 The text colour on teal colours is black while blue gray colours use white text. The main application font used is DroidSans (Apache License).
+
+\section{Data and Storage}
+
+Alfred uses a SQLite relational database as part of the built-in Android functionality. The following describes the schema pertaining to the private information persisted on the user's device:
+
+\begin{center}
+\includegraphics[scale=0.5]{images/schema.pdf}
+\end{center}
+
+Using the relational database as opposed to binary files offers better performance and granular data extraction better suited for navigating content throughout the application.
+
 
 \end{document}

@@ -7,3 +7,10 @@
 /build
 /captures
 .externalNativeBuild
+
+# latex
+.log
+.synctex.gz
+.aux
+.out
+.toc
