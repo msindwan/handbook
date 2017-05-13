@@ -47,17 +47,18 @@
 
             <ImageButton
                 android:contentDescription="@string/new_step"
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 android:onClick="onCreateStep"
-                android:textColor="@android:color/white"
+                android:tint="@android:color/white"
                 android:background="@android:color/transparent"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@mipmap/ic_add_circle_white_24dp"/>
+                android:src="@mipmap/ic_add_black_24dp"/>
 
             <ImageButton
+                android:onClick="onSaveEditor"
                 android:contentDescription="@string/save"
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 android:background="@android:color/transparent"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -69,6 +70,7 @@
     </android.support.v7.widget.Toolbar>
 
     <LinearLayout
+        android:background="@color/colorPrimaryDark"
         android:orientation="horizontal"
         android:baselineAligned="false"
         android:layout_weight="1"
@@ -79,7 +81,6 @@
 
         <ScrollView
             android:id="@+id/editor_form_tab_scrollview"
-            android:background="@color/colorPrimaryDark"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
@@ -95,12 +96,13 @@
 
         <ScrollView
             android:id="@+id/editor_form_scroll_view"
-            android:layout_margin="5dp"
+            android:background="@android:color/white"
             android:fillViewport="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <LinearLayout
+                android:layout_margin="5dp"
                 android:id="@+id/editor_form"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

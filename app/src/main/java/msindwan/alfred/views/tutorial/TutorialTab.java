@@ -15,7 +15,7 @@ import msindwan.alfred.R;
  * Created by Mayank Sindwani on 2017-05-06.
  *
  * TutorialTab:
- * Defines a view component for tutorial tabs.
+ * Defines a view component for tutorial fragments.
  */
 public class TutorialTab extends RelativeLayout {
 

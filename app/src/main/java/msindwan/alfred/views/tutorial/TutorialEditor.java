@@ -1,5 +1,7 @@
 package msindwan.alfred.views.tutorial;
 
+import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -8,9 +10,13 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
+import msindwan.alfred.data.DataContentProvider;
+import msindwan.alfred.data.schema.TutorialTable;
 import msindwan.alfred.models.Tutorial;
 import msindwan.alfred.models.TutorialStep;
 
@@ -99,11 +105,13 @@ public class TutorialEditor extends AppCompatActivity {
             tab = m_editorTabs.get(m_activeTab);
         }
 
+        m_editorTutorialName.setText(m_tutorial.getName());
         tab.setBackgroundColour(R.color.colorSecondaryDark);
     }
 
     /**
      * Adds a step to the tutorial.
+     *
      * @return : The position of the step in the tutorial
      */
     private TutorialTab addTab(int tabIndex) {
@@ -124,6 +132,7 @@ public class TutorialEditor extends AppCompatActivity {
 
     /**
      * Removes the step corresponding to the tab.
+     *
      * @param tabIndex : The step's tab position.
      */
     private void removeTab(int tabIndex) {
@@ -138,7 +147,7 @@ public class TutorialEditor extends AppCompatActivity {
 
         // Update the active tab.
         if (tabIndex == m_activeTab) {
-            setActiveTab(Math.min(0, tabIndex - 1));
+            setActiveTab(Math.max(0, tabIndex - 1));
         } else if (tabIndex < m_activeTab) {
             m_activeTab--;
         }
@@ -146,15 +155,13 @@ public class TutorialEditor extends AppCompatActivity {
 
     /**
      * Sets the state of the specified tab to "active".
+     *
      * @param tabIndex : The position of the tab
      */
     private void setActiveTab(int tabIndex) {
-        // If the tab is already active, don't do anything.
-        if (tabIndex == m_activeTab) return;
-
         TutorialTab tab = m_editorTabs.get(tabIndex);
 
-        // Deactivate all tabs.
+        // Deactivate all fragments.
         for (TutorialTab t : m_editorTabs) {
             t.setBackgroundColour(R.color.colorPrimary);
         }
@@ -184,6 +191,7 @@ public class TutorialEditor extends AppCompatActivity {
 
     /**
      * Handler to create a new step.
+     *
      * @param view : The element.
      */
     public void onCreateStep(View view) {
@@ -196,8 +204,44 @@ public class TutorialEditor extends AppCompatActivity {
         setActiveTab(tabIndex);
     }
 
+
+    /**
+     * Handler to save the current tutorial.
+     *
+     * @param view : The element.
+     */
+    public void onSaveEditor(View view) {
+        final ProgressDialog progress=new ProgressDialog(this);
+        progress.setMessage("Saving Tutorial");
+        progress.show();
+
+        final Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+
+                    // Defines an object to contain the new values to insert
+                    ContentValues mNewValues = new ContentValues();
+                    mNewValues.put(TutorialTable.COL_NAME, m_tutorial.getName());
+                    getContentResolver().insert(DataContentProvider.TUTORIAL_URI, mNewValues);
+
+                    progress.dismiss();
+                    finish();
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        t.start();
+    }
+
+
     /**
      * Handler to cancel creating or editing a tutorial.
+     *
      * @param view : The element.
      */
     public void onCancelEditor(View view) {
@@ -212,13 +256,19 @@ public class TutorialEditor extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             TutorialTab tab = (TutorialTab)(v.getParent()).getParent();
-            setActiveTab(m_editorTabs.indexOf(tab));
+
+            int tabIndex = m_editorTabs.indexOf(tab);
+
+            // If the tab is already active, don't do anything.
+            if (tabIndex != m_activeTab) {
+                setActiveTab(tabIndex);
+            }
         }
 
     };
 
     /**
-     * Listener for removing tabs.
+     * Listener for removing fragments.
      */
     private View.OnClickListener onTabRemoveClick = new View.OnClickListener() {
 

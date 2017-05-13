@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by Mayank Sindwani on 2017-05-06.
  *
- * Tutorial Step:
+ * TutorialTable Step:
  * Represents the data pertaining to a single step
  * in a tutorial.
  */
@@ -24,11 +24,6 @@ public class TutorialStep implements Parcelable {
 
     public int describeContents() {
         return 0;
-    }
-
-    @Override
-    public String toString() {
-        return m_title;
     }
 
     public void writeToParcel(Parcel out, int flags) {

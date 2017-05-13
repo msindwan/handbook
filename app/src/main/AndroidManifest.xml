@@ -4,17 +4,15 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:label="@string/dashboard_title"
             android:name=".views.dashboard.Dashboard">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -22,6 +20,8 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:name=".views.tutorial.TutorialEditor">
         </activity>
+        <provider android:name=".data.DataContentProvider"
+            android:authorities="msindwan.alfred.data.DataContentProvider"/>
     </application>
 
 </manifest>

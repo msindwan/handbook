@@ -1,12 +1,19 @@
 <resources>
     <string name="app_name">Alfred</string>
-    <string name="dashboard_title">Tutorials</string>
     <string name="cancel">Cancel</string>
     <string name="new_step">New Step</string>
     <string name="save">Save</string>
     <string name="add_image">Add Image</string>
     <string name="remove_step">Remove Step</string>
-    <string name="title_placeholder">Enter the Title...</string>
-    <string name="description_placeholder">Enter the Description...</string>
-    <string name="tutorial_name_placeholder">Tutorial Name...</string>
+    <string name="title_placeholder">Enter the Title</string>
+    <string name="description_placeholder">Enter the Description</string>
+    <string name="tutorial_name_placeholder">Tutorial Name</string>
+    <string name="get_started">Get Started</string>
+    <string name="dashboard_placeholder">Salutations! You do not have any tutorials at the moment.</string>
+    <string name="more">More</string>
+    <string name="share">Share</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="last_modified">Last Modified:</string>
+    <string name="no_tutorials">There are no tutorials to display.</string>
 </resources>
