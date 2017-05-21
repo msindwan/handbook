@@ -8,7 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 
 import msindwan.alfred.R;
-import msindwan.alfred.views.dashboard.fragments.TutorialTabPager;
+import msindwan.alfred.views.dashboard.components.TutorialTabPager;
 import msindwan.alfred.views.tutorial.TutorialEditor;
 
 /**

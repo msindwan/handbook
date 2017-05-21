@@ -3,18 +3,23 @@ package msindwan.alfred.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.ArrayList;
 
 /**
  * Created by Mayank Sindwani on 2017-05-06.
  *
- * TutorialTable:
- * Represents a tutorial to display.
+ * Tutorial:
+ * Represents the data in a tutorial.
  */
+@SuppressWarnings("unused")
 public class Tutorial implements Parcelable {
 
-    private ArrayList<TutorialStep> m_steps;
+    private ArrayList<Step> m_steps;
+    private String m_description;
     private String m_name;
+    private Long m_id;
 
     // Constructors.
     public Tutorial() {
@@ -23,25 +28,29 @@ public class Tutorial implements Parcelable {
 
     private Tutorial(Parcel in) {
         m_steps = new ArrayList<>();
+        m_description = in.readString();
         m_name = in.readString();
-        in.readTypedList(m_steps, TutorialStep.CREATOR);
+        m_id = (long)in.readValue(long.class.getClassLoader());
+        in.readTypedList(m_steps, Step.CREATOR);
     }
 
     /**
-     * Flatten TutorialTable in to a Parcel.
+     * Flatten Tutorial in to a Parcel.
      *
      * @param out The Parcel in which the object should be written.
      * @param flags Additional flags about how the object should be written.
      */
     @Override
     public void writeToParcel(Parcel out, int flags) {
+        out.writeString(m_description);
         out.writeString(m_name);
+        out.writeValue(m_id);
         out.writeTypedList(m_steps);
     }
 
     /**
      * Describe the kinds of special objects contained in this Parcelable
-     * instance's marshaled representation. (Not required for TutorialTable)
+     * instance's marshaled representation. (Not required for Tutorial)
 
      * @return 0 (no special objects)
      */
@@ -56,25 +65,45 @@ public class Tutorial implements Parcelable {
      */
     public static final Parcelable.Creator<Tutorial> CREATOR = new Parcelable.Creator<Tutorial>() {
         /**
-         * Create a new instance of the TutorialTable class.
+         * Create a new instance of the Tutorial class.
          *
          * @param in The Parcel to read the object's data from.
-         * @return a new instance of the TutorialTable class.
+         * @return a new instance of the Tutorial class.
          */
+        @Contract("_ -> !null")
         public Tutorial createFromParcel(Parcel in) {
             return new Tutorial(in);
         }
 
         /**
-         * Create a new array of the TutorialTable class.
+         * Create a new array of the Tutorial class.
          *
          * @param size Size of the array.
-         * @return an array of the TutorialTable class.
+         * @return an array of the Tutorial class.
          */
+        @Contract(value = "_ -> !null", pure = true)
         public Tutorial[] newArray(int size) {
             return new Tutorial[size];
         }
     };
+
+    /**
+     * Getter for the id.
+     *
+     * @return the tutorial id.
+     */
+    public Long getId() {
+        return m_id;
+    }
+
+    /**
+     * Setter for the id.
+     *
+     * @param id The id to set.
+     */
+    public void setId(Long id) {
+        m_id = id;
+    }
 
     /**
      * Getter for the name.
@@ -83,6 +112,24 @@ public class Tutorial implements Parcelable {
      */
     public String getName() {
         return m_name;
+    }
+
+    /**
+     * Setter for the description.
+     *
+     * @param description The description to set.
+     */
+    public void setDescription(String description) {
+        m_description = description;
+    }
+
+    /**
+     * Getter for the description.
+     *
+     * @return the tutorial description.
+     */
+    public String getDescription() {
+        return m_description;
     }
 
     /**
@@ -109,7 +156,7 @@ public class Tutorial implements Parcelable {
      * @param index The position of the desired step.
      * @return the step at the specified position.
      */
-    public TutorialStep getStep(int index) {
+    public Step getStep(int index) {
         return m_steps.get(index);
     }
 
@@ -119,7 +166,9 @@ public class Tutorial implements Parcelable {
      * @param step The step to add.
      * @return true if successful; false otherwise.
      */
-    public boolean addStep(TutorialStep step) {
+    public boolean addStep(Step step) {
+        long index = m_steps.size();
+        step.setIndex(index);
         return m_steps.add(step);
     }
 
@@ -129,8 +178,36 @@ public class Tutorial implements Parcelable {
      * @param index The position of the step to remove.
      * @return the step that was removed.
      */
-    public TutorialStep removeStep(int index) {
-        return m_steps.remove(index);
+    public Step removeStep(int index) {
+        Step step = m_steps.remove(index);
+        step.setIndex(null);
+
+        // Update the step indices.
+        for (int i = index; i < m_steps.size(); i++) {
+            m_steps.get(i).setIndex((long)i);
+        }
+        return step;
+    }
+
+    /**
+     * Swaps two steps in the array.
+     *
+     * @param i the index of an element to swap.
+     * @param j the index of an element to swap.
+     */
+    public void swapSteps(int i, int j) {
+        if (i == j) return;
+
+        Step a = m_steps.get(i);
+        Step b = m_steps.get(j);
+
+        // Update indices.
+        a.setIndex((long)j);
+        b.setIndex((long)i);
+
+        // Swap the elements.
+        m_steps.set(j, a);
+        m_steps.set(i, b);
     }
 
 }

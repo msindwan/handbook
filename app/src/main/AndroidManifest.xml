@@ -17,10 +17,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:theme="@style/AppTheme.NoActionBar"
             android:name=".views.tutorial.TutorialEditor">
         </activity>
-        <provider android:name=".data.DataContentProvider"
+        <provider
+            android:exported="false"
+            android:name=".data.DataContentProvider"
             android:authorities="msindwan.alfred.data.DataContentProvider"/>
     </application>
 

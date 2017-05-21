@@ -1,26 +1,23 @@
 package msindwan.alfred.views.tutorial;
 
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.view.Window;
 
-import java.util.ArrayList;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
-import msindwan.alfred.data.DataContentProvider;
-import msindwan.alfred.data.schema.TutorialTable;
+import msindwan.alfred.models.Requirement;
+import msindwan.alfred.models.Step;
 import msindwan.alfred.models.Tutorial;
-import msindwan.alfred.models.TutorialStep;
-
 import msindwan.alfred.R;
+import msindwan.alfred.views.tutorial.components.RequirementDialogFragment;
+import msindwan.alfred.views.tutorial.components.RequirementListItem;
+import msindwan.alfred.views.tutorial.components.EditStepView;
+import msindwan.alfred.views.tutorial.components.EditSummaryView;
+import msindwan.alfred.views.widgets.Accordion;
 
 /**
  * Created by Mayank Sindwani on 2017-05-04.
@@ -30,311 +27,282 @@ import msindwan.alfred.R;
  */
 public class TutorialEditor extends AppCompatActivity {
 
+    private static final int NUM_INITIAL_STEPS = 2;
+
+    private Accordion m_accordion;
     private Tutorial m_tutorial;
-    private int m_activeTab;
-
-    // View components.
-    private ArrayList<TutorialTab> m_editorTabs;
-
-    private EditText m_editorFormStepDescription;
-    private EditText m_editorFormStepTitle;
-    private EditText m_editorTutorialName;
-
-    private LinearLayout m_editorTabLayout;
-    private LinearLayout m_editorForm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tutorial_tutorial_editor);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        setContentView(R.layout.tutorial_editor);
         init(savedInstanceState);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        // Save the state of the tutorial and active tab.
         outState.putParcelable("tutorial", m_tutorial);
-        outState.putInt("activeTab", m_activeTab);
+        outState.putInt("activePanel", m_accordion.getActivePanel());
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.tutorial_editor_actionbar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.tutorial_editor_add_step:
+                // Add a new step.
+                Step step = new Step();
+                m_tutorial.addStep(step);
+                addStepView(step);
+                return true;
+
+            case R.id.tutorial_editor_save:
+                // TODO: Validate each panel and save the tutorial.
+                // e.g
+                // if (m_tutorial.getId() != null) {
+                //     DatabaseHelper.getInstance(this).update(m_tutorial);
+                // } else {
+                //     DatabaseHelper.getInstance(this).insert(m_tutorial);
+                // }
+                return true;
+
+            case android.R.id.home:
+                // Exit.
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
      * Initializes the component on mount.
      */
+    @SuppressWarnings("ConstantConditions")
     private void init(Bundle savedInstanceState) {
-        // Initialize components.
-        m_editorTabs                = new ArrayList<>();
-        m_editorTabLayout           = (LinearLayout)findViewById(R.id.tutorial_editor_tab_layout);
-        m_editorForm                = (LinearLayout)findViewById(R.id.editor_form);
-        m_editorFormStepDescription = (EditText)findViewById(R.id.editor_form_step_description);
-        m_editorFormStepTitle       = (EditText)findViewById(R.id.editor_form_step_title);
-        m_editorTutorialName        = (EditText)findViewById(R.id.tutorial_name);
-
-        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
-
-        // Bind listeners.
-        m_editorFormStepDescription.addTextChangedListener(onEditorFormStepDescriptionChanged);
-        m_editorFormStepTitle.addTextChangedListener(onEditorFormStepTitleChanged);
-        m_editorTutorialName.addTextChangedListener(onTutorialNameChanged);
-
-        TutorialTab tab;
-
-        // Initialize the activity data or retrieve the saved state.
-        if(savedInstanceState == null || !savedInstanceState.containsKey("tutorial")) {
-            m_tutorial = new Tutorial();
-
-            // Add the initial step.
-            TutorialStep initialStep = new TutorialStep();
-            m_tutorial.addStep(initialStep);
-
-            m_activeTab = 0;
-            tab = addTab(m_activeTab);
-        } else {
-            m_tutorial = savedInstanceState.getParcelable("tutorial");
-
-            // TODO: Use a fallback instead of throwing an exception
-            if(m_tutorial == null) {
-                throw new RuntimeException();
-            }
-
-            for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
-                addTab(i);
-            }
-
-            m_activeTab = savedInstanceState.getInt("activeTab", 0);
-            tab = m_editorTabs.get(m_activeTab);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        m_editorTutorialName.setText(m_tutorial.getName());
-        tab.setBackgroundColour(R.color.colorSecondaryDark);
-    }
+        m_accordion = (Accordion)findViewById(R.id.tutorial_panels);
 
-    /**
-     * Adds a step to the tutorial.
-     *
-     * @return : The position of the step in the tutorial
-     */
-    private TutorialTab addTab(int tabIndex) {
-        TutorialTab newTab = new TutorialTab(this);
+        // Add the summary panel.
+        Accordion.Panel panel = new Accordion.Panel(this);
+        EditSummaryView summary = new EditSummaryView(this, panel);
+        panel.setPanelView(summary);
+        panel.setTitle("Summary");
+        m_accordion.addPanel(panel);
 
-        // Add tab event listeners.
-        newTab.setButtonOnClickListener(onTabClick);
-        newTab.setRemoveOnClickListener(onTabRemoveClick);
-
-        // Add the new step and the corresponding tab.
-        m_editorTabLayout.addView(newTab);
-        m_editorTabs.add(newTab);
-
-        newTab.setText(String.format(Locale.getDefault(), "%d", tabIndex + 1));
-        newTab.setBackgroundColour(R.color.colorPrimary);
-        return newTab;
-    }
-
-    /**
-     * Removes the step corresponding to the tab.
-     *
-     * @param tabIndex : The step's tab position.
-     */
-    private void removeTab(int tabIndex) {
-        // Remove the tab.
-        m_editorTabLayout.removeView(m_editorTabs.get(tabIndex));
-        m_editorTabs.remove(tabIndex);
-
-        // Update the tab step labels.
-        for (int i = tabIndex; i < m_editorTabs.size(); i++) {
-            m_editorTabs.get(i).setText(String.format(Locale.getDefault(), "%d", i + 1));
-        }
-
-        // Update the active tab.
-        if (tabIndex == m_activeTab) {
-            setActiveTab(Math.max(0, tabIndex - 1));
-        } else if (tabIndex < m_activeTab) {
-            m_activeTab--;
-        }
-    }
-
-    /**
-     * Sets the state of the specified tab to "active".
-     *
-     * @param tabIndex : The position of the tab
-     */
-    private void setActiveTab(int tabIndex) {
-        TutorialTab tab = m_editorTabs.get(tabIndex);
-
-        // Deactivate all fragments.
-        for (TutorialTab t : m_editorTabs) {
-            t.setBackgroundColour(R.color.colorPrimary);
-        }
-
-        // Activate the specified tab and set the active tab.
-        tab.setBackgroundColour(R.color.colorSecondaryDark);
-        m_activeTab = tabIndex;
-
-        // Apply the step information to the form.
-        TutorialStep step = m_tutorial.getStep(tabIndex);
-
-        m_editorForm.setAlpha(0f);
-
-        // Populate the form with the step information.
-        m_editorFormStepTitle.setText(step.getTitle());
-        m_editorFormStepDescription.setText(step.getDescription());
-
-        m_editorForm.animate()
-                .alpha(1f)
-                .setDuration(getResources().getInteger(
-                        android.R.integer.config_shortAnimTime))
-                .setListener(null);
-    }
-
-
-    // Event handlers.
-
-    /**
-     * Handler to create a new step.
-     *
-     * @param view : The element.
-     */
-    public void onCreateStep(View view) {
-        // Create a new step.
-        int tabIndex = m_tutorial.getNumSteps();
-        m_tutorial.addStep(new TutorialStep());
-
-        // Add the corresponding tab and activate it.
-        addTab(tabIndex);
-        setActiveTab(tabIndex);
-    }
-
-
-    /**
-     * Handler to save the current tutorial.
-     *
-     * @param view : The element.
-     */
-    public void onSaveEditor(View view) {
-        final ProgressDialog progress=new ProgressDialog(this);
-        progress.setMessage("Saving Tutorial");
-        progress.show();
-
-        final Thread t = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    TimeUnit.SECONDS.sleep(2);
-
-                    // Defines an object to contain the new values to insert
-                    ContentValues mNewValues = new ContentValues();
-                    mNewValues.put(TutorialTable.COL_NAME, m_tutorial.getName());
-                    getContentResolver().insert(DataContentProvider.TUTORIAL_URI, mNewValues);
-
-                    progress.dismiss();
-                    finish();
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+        // Preserve the state of the view.
+        if(savedInstanceState == null
+                || !savedInstanceState.containsKey("tutorial")
+                || savedInstanceState.get("tutorial") == null) {
+            // If no tutorial is saved in the current context, create/fetch the tutorial.
+            m_tutorial = getIntent().getParcelableExtra("tutorial");
+            if (m_tutorial == null) {
+                m_tutorial = new Tutorial();
+                for (int i = 0; i < NUM_INITIAL_STEPS; i++) {
+                    Step step = new Step();
+                    m_tutorial.addStep(step);
+                    addStepView(step);
                 }
             }
-        };
+        } else {
+            // Otherwise, retrieve the old state and render the view
+            // accordingly.
+            m_tutorial = savedInstanceState.getParcelable("tutorial");
+            for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
+                addStepView(m_tutorial.getStep(i));
+            }
+            int activePanel = savedInstanceState.getInt("activePanel", 0);
+            m_accordion.setActivePanel(m_accordion.getPanel(activePanel));
+        }
 
-        t.start();
     }
 
+    /**
+     * Re-renders the step views and updates the steps
+     * based on the state of the accordion.
+     */
+    private void repaintStepViews() {
+        // Set the panel titles based on the index.
+        for (int i = 1; i < m_accordion.getNumPanels(); i++) {
+            Accordion.Panel panel = m_accordion.getPanel(i);
+            panel.setTitle(String.format(Locale.getDefault(), "Step %d", i));
+        }
+
+        EditStepView view;
+
+        // Adjust move buttons according to the index and the number of panels.
+        if (m_accordion.getNumPanels() > 2) {
+
+            // Disable the "move up" button for the first panel.
+            view = (EditStepView)m_accordion.getPanel(1).getPanelView();
+            view.toggleMoveUpButton(false);
+            view.toggleMoveDownButton(true);
+
+            // Disable the move down button for the last panel.
+            view = (EditStepView)m_accordion.getPanel(m_accordion.getNumPanels() - 1).getPanelView();
+            view.toggleMoveUpButton(true);
+            view.toggleMoveDownButton(false);
+
+            // Enable both buttons for the views between the first and last step.
+            for (int i = 2; i < m_accordion.getNumPanels() - 1; i++) {
+                view = (EditStepView)m_accordion.getPanel(i).getPanelView();
+                view.toggleMoveUpButton(true);
+                view.toggleMoveDownButton(true);
+            }
+
+        } else if (m_accordion.getNumPanels() == 2) {
+            // If only one step is present, disable movement.
+            view = (EditStepView)m_accordion.getPanel(1).getPanelView();
+            view.toggleMoveUpButton(false);
+            view.toggleMoveDownButton(false);
+        }
+    }
 
     /**
-     * Handler to cancel creating or editing a tutorial.
+     * Adds a step view to the editor.
      *
-     * @param view : The element.
+     * @return the added view instance.
      */
-    public void onCancelEditor(View view) {
-        finish();
+    private Accordion.Panel addStepView(Step step) {
+        // Create the views.
+        Accordion.Panel panel = new Accordion.Panel(this);
+        EditStepView stepView = new EditStepView(this, step, panel);
+
+        // Bind listeners.
+        stepView.setOnAddRequirementListener(onAddRequirement);
+        stepView.setOnRemoveListener(onRemoveStepView);
+        stepView.setOnMoveDownListener(onMoveDown);
+        stepView.setOnMoveUpListener(onMoveUp);
+
+        panel.setPanelView(stepView);
+        m_accordion.addPanel(panel);
+        repaintStepViews();
+        return panel;
     }
 
     /**
-     * Listener for tab clicks.
+     * Removes a step view from the editor.
+     *
+     * @param panel the parent panel to remove.
      */
-    private View.OnClickListener onTabClick = new View.OnClickListener() {
+    private void removeStepView(Accordion.Panel panel) {
+        // Find the index of the step.
+        int stepIndex = m_accordion.getPanelIndex(panel) - 1;
 
+        // Remove the parent panel and its corresponding step.
+        m_accordion.removePanel(panel);
+        m_tutorial.removeStep(stepIndex);
+
+        repaintStepViews();
+    }
+
+    // Event Handlers.
+
+    /**
+     * Listener for removing a step view.
+     */
+    private View.OnClickListener onRemoveStepView = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            TutorialTab tab = (TutorialTab)(v.getParent()).getParent();
-
-            int tabIndex = m_editorTabs.indexOf(tab);
-
-            // If the tab is already active, don't do anything.
-            if (tabIndex != m_activeTab) {
-                setActiveTab(tabIndex);
-            }
+            removeStepView((Accordion.Panel)v.getTag());
         }
-
     };
 
     /**
-     * Listener for removing fragments.
+     * Listener for moving a step view up.
      */
-    private View.OnClickListener onTabRemoveClick = new View.OnClickListener() {
-
+    private View.OnClickListener onMoveUp = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (m_editorTabs.size() > 1) {
-                TutorialTab tab = (TutorialTab) (v.getParent()).getParent();
-                int tabIndex = m_editorTabs.indexOf(tab);
+            // Find the panel index.
+            Accordion.Panel panel = (Accordion.Panel)v.getTag();
+            int panelIndex = m_accordion.getPanelIndex(panel);
 
-                // Remove the step and the corresponding tab.
-                m_tutorial.removeStep(tabIndex);
-                removeTab(tabIndex);
+            // If there is at least one panel before it, move it up.
+            if (panelIndex > 1) {
+                m_accordion.movePanel(panel, panelIndex - 1);
+                m_tutorial.swapSteps(panelIndex, panelIndex - 1);
+                repaintStepViews();
             }
         }
-
     };
 
     /**
-     * Listener for step title changes.
+     * Listener for moving a step view down.
      */
-    private TextWatcher onEditorFormStepTitleChanged = new TextWatcher() {
-
+    private View.OnClickListener onMoveDown = new View.OnClickListener() {
         @Override
-        public void afterTextChanged(Editable s) {}
+        public void onClick(View v) {
+            // Find the panel index.
+            Accordion.Panel panel = (Accordion.Panel)v.getTag();
+            int panelIndex = m_accordion.getPanelIndex(panel);
 
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            m_tutorial.getStep(m_activeTab).setTitle(m_editorFormStepTitle.getText().toString());
+            // If there is at least one panel after it, move it down.
+            if (panelIndex < m_accordion.getNumPanels() - 1) {
+                m_accordion.movePanel(panel, panelIndex + 1);
+                m_tutorial.swapSteps(panelIndex, panelIndex + 1);
+                repaintStepViews();
+            }
         }
     };
 
     /**
-     * Listener for step description changes.
+     * Listener for adding requirements.
      */
-    private TextWatcher onEditorFormStepDescriptionChanged = new TextWatcher() {
-
+    private View.OnClickListener onAddRequirement = new View.OnClickListener() {
         @Override
-        public void afterTextChanged(Editable s) {}
+        public void onClick(View v) {
+            // Create a new dialog.
+            RequirementDialogFragment dialog = new RequirementDialogFragment();
+            Accordion.Panel panel = (Accordion.Panel)v.getTag();
 
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            // Find the step index and pass it as an argument to the dialog.
+            int stepIndex = m_accordion.getPanelIndex(panel) - 1;
+            Bundle bundle = new Bundle();
+            bundle.putInt("stepIndex", stepIndex);
+            dialog.setArguments(bundle);
 
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            m_tutorial.getStep(m_activeTab).setDescription(m_editorFormStepDescription.getText().toString());
+            // Set the requirement dialog listener.
+            dialog.setRequirementDialogListener(onSubmitRequirement);
+            dialog.show(getSupportFragmentManager(), "RequirementDialogFragment");
         }
     };
 
     /**
-     * Listener for tutorial name changes.
+     * Listener for submitting requirements.
      */
-    private TextWatcher onTutorialNameChanged = new TextWatcher() {
-
+    private RequirementDialogFragment.RequirementDialogListener onSubmitRequirement
+            = new RequirementDialogFragment.RequirementDialogListener() {
         @Override
-        public void afterTextChanged(Editable s) {}
+        public void onSubmit(int stepIndex, final Requirement requirement) {
+            // Add the new requirement.
+            final EditStepView view = (EditStepView)m_accordion.getPanel(stepIndex + 1).getPanelView();
+            final RequirementListItem item = new RequirementListItem(TutorialEditor.this, requirement);
+            item.setRequirementOnRemoveListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Remove the requirement from the step and view.
+                    Step step = view.getStep();
+                    step.removeRequirement(requirement);
+                    view.removeRequirementListItem(item);
+                }
+            });
 
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            m_tutorial.setName(m_editorTutorialName.getText().toString());
+            view.getStep().addRequirement(requirement);
+            view.addRequirementListItem(item);
         }
     };
-
 }
+

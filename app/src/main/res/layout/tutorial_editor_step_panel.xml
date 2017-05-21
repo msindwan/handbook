@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:background="@drawable/row_divider"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:scaleType="fitXY"
+            android:padding="5dp"
+            android:id="@+id/tutorial_editor_move_up"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:tint="@color/colorAccent"
+            android:src="@mipmap/ic_expand_less_black_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <ImageButton
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:id="@+id/tutorial_editor_move_down"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:tint="@color/colorAccent"
+            android:src="@mipmap/ic_expand_more_black_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <ImageButton
+            android:scaleType="fitXY"
+            android:padding="5dp"
+            android:id="@+id/tutorial_editor_remove_step"
+            android:layout_gravity="end"
+            android:background="@android:color/transparent"
+            android:tint="@color/colorSecondaryAccent"
+            android:src="@mipmap/ic_delete_forever_white_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="5dp"
+        android:text="Title"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textStyle="bold" />
+
+    <EditText
+        android:saveEnabled="false"
+        android:id="@+id/tutorial_editor_title"
+        android:background="@drawable/border"
+        android:layout_width="match_parent"
+        android:padding="10dp"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:text="Requirements"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/tutorial_editor_requirements"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:text="Add Requirement"
+        android:id="@+id/tutorial_editor_add_requirement"
+        android:background="#eee"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:text="Instructions"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textStyle="bold" />
+
+    <EditText
+        android:saveEnabled="false"
+        android:id="@+id/tutorial_editor_instructions"
+        android:inputType="textMultiLine"
+        android:gravity="top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/border"
+        android:padding="10dp"
+        android:minLines="5"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+</LinearLayout>

@@ -21,7 +21,7 @@
             android:id="@+id/dashboard_list_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tutorial_name_placeholder" />
+            android:text="@string/tutorial_name" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -55,7 +55,7 @@
         android:contentDescription="@string/more"
         android:padding="5dp"
         android:background="@android:color/transparent"
-        android:tint="@color/colorSecondaryDark"
+        android:tint="@color/colorSecondaryAccent"
         android:id="@+id/dashboard_list_item_menu_button"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
