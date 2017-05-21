@@ -21,11 +21,16 @@ import msindwan.alfred.models.Tutorial;
 @SuppressWarnings("WeakerAccess")
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static DatabaseHelper m_instance;
-
     private static final String DATABASE_NAME = "alfred";
     private static final int DATABASE_VERSION = 1;
+    private static DatabaseHelper m_instance;
 
+    /**
+     * Gets the singleton instance.
+     * @param context the application context.
+     *
+     * @return the database instance.
+     */
     public static synchronized DatabaseHelper getInstance(Context context) {
         if (m_instance == null) {
             m_instance = new DatabaseHelper(context.getApplicationContext());
@@ -33,6 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return m_instance;
     }
 
+    // Private constructor to prevent instance instantiation.
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }

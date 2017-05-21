@@ -347,9 +347,6 @@ public class Accordion extends RelativeLayout {
         final LinearLayout panelLayout = panel.getLayout();
         panel.deactivateHeader();
 
-        // Measure the expected height for the panel.
-        panelLayout.measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-
         ValueAnimator hideLayout = ValueAnimator
                 .ofInt(panelLayout.getHeight(), 0)
                 .setDuration(400);

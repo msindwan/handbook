@@ -12,6 +12,7 @@
         android:layout_height="wrap_content">
 
         <ImageButton
+            android:contentDescription="@string/move_up"
             android:scaleType="fitXY"
             android:padding="5dp"
             android:id="@+id/tutorial_editor_move_up"
@@ -23,6 +24,7 @@
             android:layout_height="match_parent" />
 
         <ImageButton
+            android:contentDescription="@string/move_down"
             android:scaleType="fitCenter"
             android:padding="5dp"
             android:id="@+id/tutorial_editor_move_down"
@@ -39,6 +41,7 @@
             android:layout_height="match_parent" />
 
         <ImageButton
+            android:contentDescription="@string/delete"
             android:scaleType="fitXY"
             android:padding="5dp"
             android:id="@+id/tutorial_editor_remove_step"
@@ -58,12 +61,13 @@
         android:paddingRight="10dp"
         android:paddingTop="10dp"
         android:paddingBottom="5dp"
-        android:text="Title"
+        android:text="@string/title"
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textStyle="bold" />
 
     <EditText
+        android:inputType="text"
         android:saveEnabled="false"
         android:id="@+id/tutorial_editor_title"
         android:background="@drawable/border"
@@ -80,7 +84,7 @@
         android:paddingRight="10dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="Requirements"
+        android:text="@string/requirements"
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textStyle="bold" />
@@ -88,11 +92,11 @@
     <LinearLayout
         android:id="@+id/tutorial_editor_requirements"
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <Button
-        android:text="Add Requirement"
+        android:text="@string/add_requirement"
         android:id="@+id/tutorial_editor_add_requirement"
         android:background="#eee"
         android:layout_marginLeft="10dp"
@@ -109,7 +113,7 @@
         android:paddingRight="10dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:text="Instructions"
+        android:text="@string/instructions"
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textStyle="bold" />

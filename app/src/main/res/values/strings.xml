@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Alfred</string>
     <string name="cancel">Cancel</string>
-    <string name="confirm">Ok</string>
+    <string name="confirm">OK</string>
     <string name="add_step">Add Step</string>
     <string name="save">Save</string>
     <string name="remove_step">Remove Step</string>
@@ -13,4 +13,14 @@
     <string name="delete">Delete</string>
     <string name="last_modified">Last Modified:</string>
     <string name="no_tutorials">There are no tutorials to display.</string>
+    <string name="name">Name</string>
+    <string name="amount">Amount (Optional)</string>
+    <string name="unit">Unit (Optional)</string>
+    <string name="unit_example">e.g lbs</string>
+    <string name="title">Title</string>
+    <string name="move_up">Move Up</string>
+    <string name="move_down">Move Down</string>
+    <string name="requirements">Requirements</string>
+    <string name="add_requirement">Add Requirement</string>
+    <string name="instructions">Instructions</string>
 </resources>

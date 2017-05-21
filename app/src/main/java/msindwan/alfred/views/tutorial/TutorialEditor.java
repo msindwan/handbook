@@ -93,40 +93,43 @@ public class TutorialEditor extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        int activePanel = 0;
         m_accordion = (Accordion)findViewById(R.id.tutorial_panels);
-
-        // Add the summary panel.
-        Accordion.Panel panel = new Accordion.Panel(this);
-        EditSummaryView summary = new EditSummaryView(this, panel);
-        panel.setPanelView(summary);
-        panel.setTitle("Summary");
-        m_accordion.addPanel(panel);
 
         // Preserve the state of the view.
         if(savedInstanceState == null
                 || !savedInstanceState.containsKey("tutorial")
                 || savedInstanceState.get("tutorial") == null) {
-            // If no tutorial is saved in the current context, create/fetch the tutorial.
+            // If no tutorial is saved in the current context, fetch the tutorial argument.
             m_tutorial = getIntent().getParcelableExtra("tutorial");
+
+            // If no tutorial was passed, create a new instance.
             if (m_tutorial == null) {
                 m_tutorial = new Tutorial();
                 for (int i = 0; i < NUM_INITIAL_STEPS; i++) {
-                    Step step = new Step();
-                    m_tutorial.addStep(step);
-                    addStepView(step);
+                    m_tutorial.addStep(new Step());
                 }
             }
         } else {
             // Otherwise, retrieve the old state and render the view
             // accordingly.
             m_tutorial = savedInstanceState.getParcelable("tutorial");
-            for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
-                addStepView(m_tutorial.getStep(i));
-            }
-            int activePanel = savedInstanceState.getInt("activePanel", 0);
-            m_accordion.setActivePanel(m_accordion.getPanel(activePanel));
+            activePanel = savedInstanceState.getInt("activePanel", 0);
         }
 
+        // Add the summary panel.
+        Accordion.Panel panel = new Accordion.Panel(this);
+        EditSummaryView summary = new EditSummaryView(this, m_tutorial, panel);
+        panel.setPanelView(summary);
+        panel.setTitle("Summary");
+        m_accordion.addPanel(panel);
+
+        // Add step views.
+        for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
+            addStepView(m_tutorial.getStep(i));
+        }
+
+        m_accordion.setActivePanel(m_accordion.getPanel(activePanel));
     }
 
     /**
@@ -233,7 +236,7 @@ public class TutorialEditor extends AppCompatActivity {
             // If there is at least one panel before it, move it up.
             if (panelIndex > 1) {
                 m_accordion.movePanel(panel, panelIndex - 1);
-                m_tutorial.swapSteps(panelIndex, panelIndex - 1);
+                m_tutorial.swapSteps(panelIndex - 1, panelIndex - 2);
                 repaintStepViews();
             }
         }
@@ -252,7 +255,7 @@ public class TutorialEditor extends AppCompatActivity {
             // If there is at least one panel after it, move it down.
             if (panelIndex < m_accordion.getNumPanels() - 1) {
                 m_accordion.movePanel(panel, panelIndex + 1);
-                m_tutorial.swapSteps(panelIndex, panelIndex + 1);
+                m_tutorial.swapSteps(panelIndex - 1, panelIndex);
                 repaintStepViews();
             }
         }

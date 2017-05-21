@@ -14,7 +14,7 @@
         <EditText
             android:id="@+id/requirement_name"
             android:inputType="text"
-            android:hint="Name"
+            android:hint="@string/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -34,7 +34,7 @@
                     android:padding="4dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Amount (Optional)">
+                    android:text="@string/amount">
                 </TextView>
 
                 <EditText
@@ -56,12 +56,12 @@
                     android:padding="4dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Unit (Optional)">
+                    android:text="@string/unit">
                 </TextView>
 
                 <EditText
                     android:id="@+id/requirement_unit"
-                    android:hint="e.g lbs"
+                    android:hint="@string/unit_example"
                     android:inputType="text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
