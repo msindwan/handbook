@@ -18,19 +18,22 @@ public class Tutorial implements Parcelable {
 
     private ArrayList<Step> m_steps;
     private String m_description;
+    private int m_numViews;
     private String m_name;
     private Long m_id;
 
     // Constructors.
     public Tutorial() {
         m_steps = new ArrayList<>();
+        m_numViews = 0;
     }
 
     private Tutorial(Parcel in) {
         m_steps = new ArrayList<>();
         m_description = in.readString();
         m_name = in.readString();
-        m_id = (long)in.readValue(long.class.getClassLoader());
+        m_id = (Long)in.readValue(Long.class.getClassLoader());
+        m_numViews = in.readInt();
         in.readTypedList(m_steps, Step.CREATOR);
     }
 
@@ -45,6 +48,7 @@ public class Tutorial implements Parcelable {
         out.writeString(m_description);
         out.writeString(m_name);
         out.writeValue(m_id);
+        out.writeValue(m_numViews);
         out.writeTypedList(m_steps);
     }
 
@@ -103,6 +107,24 @@ public class Tutorial implements Parcelable {
      */
     public void setId(Long id) {
         m_id = id;
+    }
+
+    /**
+     * Getter for the number of views.
+     *
+     * @return the number of views.
+     */
+    public int getNumViews() {
+        return m_numViews;
+    }
+
+    /**
+     * Setter for the number of views.
+     *
+     * @param views The view count to set.
+     */
+    public void setNumViews(int views) {
+        m_numViews = views;
     }
 
     /**

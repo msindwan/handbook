@@ -1,5 +1,8 @@
 package msindwan.alfred.views.tutorial;
 
+import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,6 +12,8 @@ import android.view.Window;
 
 import java.util.Locale;
 
+import msindwan.alfred.data.DataContentProvider;
+import msindwan.alfred.data.DatabaseHelper;
 import msindwan.alfred.models.Requirement;
 import msindwan.alfred.models.Step;
 import msindwan.alfred.models.Tutorial;
@@ -65,12 +70,42 @@ public class TutorialEditor extends AppCompatActivity {
 
             case R.id.tutorial_editor_save:
                 // TODO: Validate each panel and save the tutorial.
-                // e.g
-                // if (m_tutorial.getId() != null) {
-                //     DatabaseHelper.getInstance(this).update(m_tutorial);
-                // } else {
-                //     DatabaseHelper.getInstance(this).insert(m_tutorial);
-                // }
+                final ProgressDialog progress = new ProgressDialog(this);
+                progress.setMessage("Saving Tutorial");
+                progress.show();
+
+                final Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        DatabaseHelper helper = DatabaseHelper.getInstance(TutorialEditor.this);
+                        SQLiteDatabase db = helper.getWritableDatabase();
+
+                        // Start an insert / update transaction.
+                        db.beginTransaction();
+                        if (m_tutorial.getId() == null) {
+                            helper.insert(m_tutorial);
+                        } else {
+                            helper.update(m_tutorial);
+                        }
+                        db.setTransactionSuccessful();
+                        db.endTransaction();
+
+                        // Notify the content provider.
+                        ContentResolver resolver = getContentResolver();
+                        resolver.notifyChange(DataContentProvider.TUTORIAL_URI, null);
+
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        finish();
+                        progress.dismiss();
+                    }
+                };
+
+                t.start();
                 return true;
 
             case android.R.id.home:
@@ -101,14 +136,18 @@ public class TutorialEditor extends AppCompatActivity {
                 || !savedInstanceState.containsKey("tutorial")
                 || savedInstanceState.get("tutorial") == null) {
             // If no tutorial is saved in the current context, fetch the tutorial argument.
-            m_tutorial = getIntent().getParcelableExtra("tutorial");
+            String tutorial_id = getIntent().getStringExtra("tutorial_id");
 
-            // If no tutorial was passed, create a new instance.
-            if (m_tutorial == null) {
-                m_tutorial = new Tutorial();
+            m_tutorial = new Tutorial();
+            if (tutorial_id == null) {
+                // If no tutorial was passed, create a new instance.
                 for (int i = 0; i < NUM_INITIAL_STEPS; i++) {
                     m_tutorial.addStep(new Step());
                 }
+            } else {
+                // Fetch the corresponding tutorial.
+                DatabaseHelper helper = DatabaseHelper.getInstance(this);
+                helper.fetch(m_tutorial, Integer.parseInt(tutorial_id));
             }
         } else {
             // Otherwise, retrieve the old state and render the view

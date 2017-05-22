@@ -124,7 +124,7 @@ public class Step implements Parcelable {
      *
      * @param index The index to set.
      */
-    void setIndex(Long index) {
+    public void setIndex(Long index) {
         m_index = index;
     }
 

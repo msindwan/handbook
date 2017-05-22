@@ -1,6 +1,7 @@
 package msindwan.alfred.views.dashboard.components;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -16,8 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.AdapterView;
 import android.support.v4.app.LoaderManager;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -27,6 +27,7 @@ import java.util.Locale;
 import msindwan.alfred.R;
 import msindwan.alfred.data.DataContentProvider;
 import msindwan.alfred.data.schema.TutorialTable;
+import msindwan.alfred.views.tutorial.TutorialEditor;
 
 /**
  * Created by Mayank Sindwani on 2017-05-03.
@@ -55,9 +56,6 @@ public class TutorialListFragment
      */
     private class TutorialListAdapter extends SimpleCursorAdapter {
 
-        private ImageButton m_menuButton;
-        private LinearLayout m_listItem;
-
         // Constructor.
         private TutorialListAdapter(
                 Context context,
@@ -80,28 +78,12 @@ public class TutorialListFragment
          */
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            View view = super.getView(position, convertView, parent);
-            registerForContextMenu(view);
+            final View view = super.getView(position, convertView, parent);
 
-            // Initialize components.
-            m_menuButton = (ImageButton)view.findViewById(R.id.dashboard_list_item_menu_button);
-            m_listItem = (LinearLayout) view.findViewById(R.id.dashboard_list_item);
+            Cursor cursor = (Cursor)m_adapter.getItem(position);
+            long id = cursor.getLong(cursor.getColumnIndex(TutorialTable.COL_ID));
+            view.setTag(id);
 
-            // Bind event listeners.
-            m_menuButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getActivity().openContextMenu(m_menuButton);
-                }
-            });
-            m_listItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // TODO: Extract information to view the selected tutorial
-                    // E.g. Cursor cursor = (Cursor)getItem(position);
-                    //      String name = cursor.getString(cursor.getColumnIndex(TutorialTable.COL_NAME));
-                }
-            });
             return view;
         }
     }
@@ -136,6 +118,7 @@ public class TutorialListFragment
 
         // Initialize the loader.
         getLoaderManager().initLoader(0, null, this);
+        registerForContextMenu(getListView());
     }
 
     /**
@@ -164,16 +147,17 @@ public class TutorialListFragment
      */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        // TODO: Extract information to modify the selected tutorial
-        // E.g.
-        //      AdapterView.AdapterContextMenuInfo info
-        //          = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-        //      Cursor cursor = (Cursor)m_adapter.getItem(info.position);
-        //      String name = cursor.getString(cursor.getColumnIndex(TutorialTable.COL_NAME));
+        AdapterView.AdapterContextMenuInfo info
+                = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+
+        long id = (long)info.targetView.getTag();
 
         switch (item.getItemId()) {
             case R.id.dashboard_list_item_menu_edit:
-                break;
+                Intent intent = new Intent(getContext(), TutorialEditor.class);
+                intent.putExtra("tutorial_id", Long.toString(id));
+                startActivity(intent);
+                return true;
             case R.id.dashboard_list_item_menu_share:
                 break;
             case R.id.dashboard_list_item_menu_delete:

@@ -3,7 +3,7 @@ package msindwan.alfred.views.dashboard.components;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import msindwan.alfred.data.schema.TutorialTable;
 
@@ -13,7 +13,7 @@ import msindwan.alfred.data.schema.TutorialTable;
  * TutorialTabPager:
  * Defines the fragment state pager for tutorial tabs.
  */
-public class TutorialTabPager extends FragmentStatePagerAdapter {
+public class TutorialTabPager extends FragmentPagerAdapter {
 
     private int m_numTabs;
 
