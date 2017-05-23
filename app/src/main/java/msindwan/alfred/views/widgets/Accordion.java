@@ -6,6 +6,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.WindowManager;
@@ -101,7 +102,8 @@ public class Accordion extends RelativeLayout {
         private void activateHeader() {
             ImageView arrow = (ImageView)m_panelHeader.findViewById(R.id.accordion_panel_arrow);
             m_title.setTextColor(Color.WHITE);
-            m_panelHeader.setBackgroundColor(Color.parseColor("#ff7062"));
+            m_title.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            m_panelHeader.setBackgroundColor(getResources().getColor(R.color.colorSecondaryAccent));
             arrow.setColorFilter(Color.argb(255, 255, 255, 255));
             arrow.animate().rotation(0).start();
         }
@@ -112,6 +114,7 @@ public class Accordion extends RelativeLayout {
         private void deactivateHeader() {
             ImageView arrow = (ImageView)m_panelHeader.findViewById(R.id.accordion_panel_arrow);
             m_title.setTextColor(Color.parseColor("#494949"));
+            m_title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
             m_panelHeader.setBackgroundColor(Color.parseColor("#ffffff"));
             arrow.setColorFilter(Color.BLACK);
             arrow.animate().rotation(-90).start();

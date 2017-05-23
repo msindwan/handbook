@@ -11,7 +11,7 @@
     <LinearLayout
         android:id="@+id/accordion_panel_header"
         android:clickable="true"
-        android:background="#E0E0E0"
+        android:background="#c05a70"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -27,6 +27,7 @@
             android:padding="15dp" />
 
         <ImageView
+            android:tint="@android:color/white"
             android:id="@+id/accordion_panel_arrow"
             android:contentDescription="@string/edit"
             android:background="@android:color/transparent"

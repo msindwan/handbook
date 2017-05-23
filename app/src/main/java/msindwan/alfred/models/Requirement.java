@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Contract;
 @SuppressWarnings("unused")
 public class Requirement implements Parcelable {
 
+    private Boolean m_deleted;
     private Boolean m_optional;
     private Double m_amount;
     private String m_name;
@@ -25,6 +26,7 @@ public class Requirement implements Parcelable {
     // Constructors.
     public Requirement() {
         m_optional = false;
+        m_deleted = false;
     }
 
     private Requirement(Parcel in) {
@@ -33,6 +35,7 @@ public class Requirement implements Parcelable {
         m_amount = (double)in.readValue(double.class.getClassLoader());
         m_stepId = (long)in.readValue(long.class.getClassLoader());
         m_optional = (Boolean)in.readValue(Boolean.class.getClassLoader());
+        m_deleted = (Boolean)in.readValue(Boolean.class.getClassLoader());
         m_id = (long)in.readValue(long.class.getClassLoader());
     }
 
@@ -49,6 +52,7 @@ public class Requirement implements Parcelable {
         out.writeValue(m_amount);
         out.writeValue(m_stepId);
         out.writeValue(m_optional);
+        out.writeValue(m_deleted);
         out.writeValue(m_id);
     }
 
@@ -200,4 +204,11 @@ public class Requirement implements Parcelable {
         m_optional = optional;
     }
 
+    public void setDeleted(Boolean deleted) {
+        m_deleted = deleted;
+    }
+
+    public Boolean isDeleted() {
+        return m_deleted;
+    }
 }

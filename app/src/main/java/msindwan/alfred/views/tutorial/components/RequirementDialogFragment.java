@@ -52,6 +52,7 @@ public class RequirementDialogFragment extends DialogFragment {
         final EditText nameText = (EditText)view.findViewById(R.id.requirement_name);
         final EditText unitText = (EditText)view.findViewById(R.id.requirement_unit);
         final EditText amountText = (EditText)view.findViewById(R.id.requirement_amount);
+        // TODO: Show checkbox for optional
 
         // Create the dialog.
         builder.setTitle("Add a Requirement");

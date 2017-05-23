@@ -18,6 +18,7 @@ import java.util.ArrayList;
 public class Step implements Parcelable {
 
     private ArrayList<Requirement> m_requirements;
+    private Boolean m_deleted;
     private String m_instructions;
     private Long m_tutorialId;
     private String m_title;
@@ -27,10 +28,12 @@ public class Step implements Parcelable {
     // Constructors.
     public Step() {
         m_requirements = new ArrayList<>();
+        m_deleted = false;
     }
 
     private Step(Parcel in) {
         m_requirements = new ArrayList<>();
+        m_deleted = (Boolean)in.readValue(Boolean.class.getClassLoader());
         m_title = in.readString();
         m_instructions = in.readString();
         m_tutorialId = (long)in.readValue(long.class.getClassLoader());
@@ -56,6 +59,7 @@ public class Step implements Parcelable {
      * @param flags Additional flags about how the object should be written.
      */
     public void writeToParcel(Parcel out, int flags) {
+        out.writeValue(m_deleted);
         out.writeString(m_title);
         out.writeString(m_instructions);
         out.writeValue(m_tutorialId);
@@ -229,5 +233,13 @@ public class Step implements Parcelable {
      */
     public boolean removeRequirement(Requirement requirement) {
         return m_requirements.remove(requirement);
+    }
+
+    public void setDeleted(Boolean deleted) {
+        m_deleted = deleted;
+    }
+
+    public Boolean isDeleted() {
+        return m_deleted;
     }
 }

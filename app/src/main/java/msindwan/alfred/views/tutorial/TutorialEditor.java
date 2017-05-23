@@ -2,7 +2,6 @@ package msindwan.alfred.views.tutorial;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -78,17 +77,13 @@ public class TutorialEditor extends AppCompatActivity {
                     @Override
                     public void run() {
                         DatabaseHelper helper = DatabaseHelper.getInstance(TutorialEditor.this);
-                        SQLiteDatabase db = helper.getWritableDatabase();
 
-                        // Start an insert / update transaction.
-                        db.beginTransaction();
+                        // TODO: Handle insert / update errors.
                         if (m_tutorial.getId() == null) {
                             helper.insert(m_tutorial);
                         } else {
                             helper.update(m_tutorial);
                         }
-                        db.setTransactionSuccessful();
-                        db.endTransaction();
 
                         // Notify the content provider.
                         ContentResolver resolver = getContentResolver();
@@ -165,7 +160,20 @@ public class TutorialEditor extends AppCompatActivity {
 
         // Add step views.
         for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
-            addStepView(m_tutorial.getStep(i));
+            Step step = m_tutorial.getStep(i);
+            Accordion.Panel view = addStepView(step);
+            EditStepView stepVew = (EditStepView)view.getPanelView();
+
+            // Add requirement list items.
+            for (int j = 0; j < step.getNumRequirements(); j++) {
+                RequirementListItem item = new RequirementListItem(
+                        this,
+                        step.getRequirement(j),
+                        stepVew
+                );
+                stepVew.addRequirementListItem(item);
+                item.setRequirementOnRemoveListener(onRequirementRemoved);
+            }
         }
 
         m_accordion.setActivePanel(m_accordion.getPanel(activePanel));
@@ -240,13 +248,33 @@ public class TutorialEditor extends AppCompatActivity {
      * @param panel the parent panel to remove.
      */
     private void removeStepView(Accordion.Panel panel) {
-        // Find the index of the step.
-        int stepIndex = m_accordion.getPanelIndex(panel) - 1;
+        // Find the corresponding step index.
+        Step step = ((EditStepView)panel.getPanelView()).getStep();
 
         // Remove the parent panel and its corresponding step.
         m_accordion.removePanel(panel);
-        m_tutorial.removeStep(stepIndex);
 
+        if (step.getId() != null) {
+            step.setDeleted(true);
+        } else {
+            m_tutorial.removeStep(step.getIndex().intValue());
+        }
+
+        repaintStepViews();
+    }
+
+    /**
+     * Moves a panel up or down.
+     * @param panel the panel to move.
+     * @param newIndex the index of the panel to swap with.
+     */
+    private void movePanel(Accordion.Panel panel, int newIndex) {
+        Accordion.Panel nextPanel = m_accordion.getPanel(newIndex);
+        Step a = ((EditStepView)panel.getPanelView()).getStep();
+        Step b = ((EditStepView)nextPanel.getPanelView()).getStep();
+
+        m_accordion.movePanel(panel, newIndex);
+        m_tutorial.swapSteps(a.getIndex().intValue(), b.getIndex().intValue());
         repaintStepViews();
     }
 
@@ -268,16 +296,9 @@ public class TutorialEditor extends AppCompatActivity {
     private View.OnClickListener onMoveUp = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Find the panel index.
             Accordion.Panel panel = (Accordion.Panel)v.getTag();
             int panelIndex = m_accordion.getPanelIndex(panel);
-
-            // If there is at least one panel before it, move it up.
-            if (panelIndex > 1) {
-                m_accordion.movePanel(panel, panelIndex - 1);
-                m_tutorial.swapSteps(panelIndex - 1, panelIndex - 2);
-                repaintStepViews();
-            }
+            movePanel(panel, panelIndex - 1);
         }
     };
 
@@ -287,16 +308,9 @@ public class TutorialEditor extends AppCompatActivity {
     private View.OnClickListener onMoveDown = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Find the panel index.
             Accordion.Panel panel = (Accordion.Panel)v.getTag();
             int panelIndex = m_accordion.getPanelIndex(panel);
-
-            // If there is at least one panel after it, move it down.
-            if (panelIndex < m_accordion.getNumPanels() - 1) {
-                m_accordion.movePanel(panel, panelIndex + 1);
-                m_tutorial.swapSteps(panelIndex - 1, panelIndex);
-                repaintStepViews();
-            }
+            movePanel(panel, panelIndex + 1);
         }
     };
 
@@ -331,19 +345,34 @@ public class TutorialEditor extends AppCompatActivity {
         public void onSubmit(int stepIndex, final Requirement requirement) {
             // Add the new requirement.
             final EditStepView view = (EditStepView)m_accordion.getPanel(stepIndex + 1).getPanelView();
-            final RequirementListItem item = new RequirementListItem(TutorialEditor.this, requirement);
-            item.setRequirementOnRemoveListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Remove the requirement from the step and view.
-                    Step step = view.getStep();
-                    step.removeRequirement(requirement);
-                    view.removeRequirementListItem(item);
-                }
-            });
-
+            final RequirementListItem item = new RequirementListItem(TutorialEditor.this, requirement, view);
+            item.setRequirementOnRemoveListener(onRequirementRemoved);
             view.getStep().addRequirement(requirement);
             view.addRequirementListItem(item);
+        }
+    };
+
+    /**
+     * Listener for removing requirements.
+     */
+    private View.OnClickListener onRequirementRemoved = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // Remove the requirement from the step and view.
+            RequirementListItem item = (RequirementListItem) v.getTag();
+            EditStepView view = (EditStepView)item.getTag();
+
+            Requirement requirement = item.getRequirement();
+            Step step = view.getStep();
+
+            // If it exists in the db, mark it for deletion.
+            // Otherwise, remove it from the tutorial.
+            if (requirement.getId() != null) {
+                requirement.setDeleted(true);
+            } else {
+                step.removeRequirement(requirement);
+            }
+            view.removeRequirementListItem(item);
         }
     };
 }

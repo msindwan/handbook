@@ -19,6 +19,7 @@ import msindwan.alfred.models.Tutorial;
  * DatabaseHelper:
  * A SQLite wrapper for the application database.
  */
+@SuppressWarnings("WeakerAccess")
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "alfred";
@@ -58,23 +59,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @param tutorial The tutorial to insert.
      */
-    public long insert(Tutorial tutorial) {
+    public Long insert(Tutorial tutorial) {
         SQLiteDatabase db = getWritableDatabase();
 
         if (tutorial.getId() != null) {
             throw new IllegalArgumentException("Tutorial ID already exists.");
         }
 
+        Boolean inTransaction = db.inTransaction();
+
         ContentValues values = new ContentValues();
         values.put(TutorialTable.COL_NAME, tutorial.getName());
         values.put(TutorialTable.COL_DESCRIPTION, tutorial.getDescription());
 
-        long id = db.insert(TutorialTable.TABLE_NAME, null, values);
+        if (!inTransaction) {
+            db.beginTransaction();
+        }
 
-        for(int i = 0; i < tutorial.getNumSteps(); i++) {
-            Step step = tutorial.getStep(i);
-            step.setTutorialId(id);
-            insert(step);
+        Long id = null;
+
+        try {
+            id = db.insert(TutorialTable.TABLE_NAME, null, values);
+
+            for(int i = 0; i < tutorial.getNumSteps(); i++) {
+                Step step = tutorial.getStep(i);
+                step.setTutorialId(id);
+                insert(step);
+            }
+            if (!inTransaction) {
+                db.setTransactionSuccessful();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (!inTransaction) {
+                db.endTransaction();
+            }
         }
 
         return id;
@@ -85,12 +105,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @param step The step to insert.
      */
-    private long insert(Step step) {
+    private Long insert(Step step) {
         SQLiteDatabase db = getWritableDatabase();
 
         if (step.getId() != null) {
             throw new IllegalArgumentException("Step ID already exists.");
         }
+
+        Boolean inTransaction = db.inTransaction();
 
         ContentValues values = new ContentValues();
         values.put(StepTable.COL_TITLE, step.getTitle());
@@ -98,12 +120,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(StepTable.COL_TUTORIAL_ID, step.getTutorialId());
         values.put(StepTable.COL_INDEX, step.getIndex());
 
-        long id = db.insert(StepTable.TABLE_NAME, null, values);
+        Long id = null;
 
-        for (int i = 0; i < step.getNumRequirements(); i++) {
-            Requirement requirement = step.getRequirement(i);
-            requirement.setStepId(id);
-            insert(requirement);
+        try {
+            id = db.insert(StepTable.TABLE_NAME, null, values);
+
+            for (int i = 0; i < step.getNumRequirements(); i++) {
+                Requirement requirement = step.getRequirement(i);
+                requirement.setStepId(id);
+                insert(requirement);
+            }
+            if (!inTransaction) {
+                db.setTransactionSuccessful();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (!inTransaction) {
+                db.endTransaction();
+            }
         }
 
         return id;
@@ -207,7 +242,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 whereArgs,
                 null,
                 null,
-                null
+                StepTable.COL_INDEX
         );
 
         if(cursor != null) {
@@ -292,9 +327,145 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
-
-    @SuppressWarnings("UnusedParameters")
     public void update(Tutorial tutorial) {
+        SQLiteDatabase db = getWritableDatabase();
 
+        if (tutorial.getId() == null) {
+            throw new IllegalArgumentException("Tutorial ID not set.");
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(TutorialTable.COL_NAME, tutorial.getName());
+        values.put(TutorialTable.COL_DESCRIPTION, tutorial.getDescription());
+        // TODO: Add updated time.
+
+        String whereClause = String.format("%s = ?", TutorialTable.COL_ID);
+        String[] whereArgs = new String[] {
+                Long.toString(tutorial.getId())
+        };
+
+        db.update(
+                TutorialTable.TABLE_NAME,
+                values,
+                whereClause,
+                whereArgs
+        );
+
+        for (int i = 0; i < tutorial.getNumSteps(); i++) {
+            Step step = tutorial.getStep(i);
+            step.setTutorialId(tutorial.getId());
+
+            if (step.getId() == null) {
+                insert(step);
+            } else if (step.isDeleted()) {
+                delete(step);
+            } else {
+                update(step);
+            }
+        }
+    }
+
+    public void update(Step step) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        if (step.getId() == null) {
+            throw new IllegalArgumentException("Step ID not set.");
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(StepTable.COL_TITLE, step.getTitle());
+        values.put(StepTable.COL_INSTRUCTIONS, step.getInstructions());
+        values.put(StepTable.COL_TUTORIAL_ID, step.getTutorialId());
+        values.put(StepTable.COL_INDEX, step.getIndex());
+
+        String whereClause = String.format("%s = ?", StepTable.COL_ID);
+        String[] whereArgs = new String[] {
+                Long.toString(step.getId())
+        };
+
+        db.update(
+                StepTable.TABLE_NAME,
+                values,
+                whereClause,
+                whereArgs
+        );
+
+        for (int i = 0; i < step.getNumRequirements(); i++) {
+            Requirement requirement = step.getRequirement(i);
+            requirement.setStepId(step.getId());
+
+            if (requirement.getId() == null) {
+                insert(requirement);
+            } else if (step.isDeleted()) {
+                delete(requirement);
+            } else {
+                update(requirement);
+            }
+        }
+    }
+
+    public void update(Requirement requirement) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        if (requirement.getId() == null) {
+            throw new IllegalArgumentException("Requirement ID not set.");
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(RequirementTable.COL_NAME, requirement.getName());
+        values.put(RequirementTable.COL_AMOUNT, requirement.getAmount());
+        values.put(RequirementTable.COL_UNIT, requirement.getUnit());
+        values.put(RequirementTable.COL_STEP_ID, requirement.getStepId());
+        values.put(RequirementTable.COL_OPTIONAL, requirement.isOptional() ? 1 : 0);
+
+        String whereClause = String.format("%s = ?", RequirementTable.COL_ID);
+        String[] whereArgs = new String[] {
+                Long.toString(requirement.getId())
+        };
+
+        db.update(
+                RequirementTable.TABLE_NAME,
+                values,
+                whereClause,
+                whereArgs
+        );
+    }
+
+    public void delete(Step step) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        if (step.getId() == null) {
+            throw new IllegalArgumentException("Step ID not set.");
+        }
+
+        String whereClause = String.format("%s = ?", StepTable.COL_ID);
+        String[] whereArgs = new String[] {
+                Long.toString(step.getId())
+        };
+
+        db.delete(
+                StepTable.TABLE_NAME,
+                whereClause,
+                whereArgs
+        );
+    }
+
+    public void delete(Requirement requirement) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        if (requirement.getId() == null) {
+            throw new IllegalArgumentException("Requirement ID not set.");
+        }
+
+        String whereClause = String.format("%s = ?", RequirementTable.COL_ID);
+        String[] whereArgs = new String[] {
+                Long.toString(requirement.getId())
+        };
+
+        db.delete(
+                RequirementTable.TABLE_NAME,
+                whereClause,
+                whereArgs
+        );
     }
 }

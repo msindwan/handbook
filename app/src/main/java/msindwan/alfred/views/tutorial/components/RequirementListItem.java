@@ -1,6 +1,7 @@
 package msindwan.alfred.views.tutorial.components;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -21,9 +22,10 @@ public class RequirementListItem extends RelativeLayout {
     private TextView m_name;
 
     // Constructors.
-    public RequirementListItem(Context context, Requirement requirement) {
+    public RequirementListItem(Context context, Requirement requirement, View tag) {
         super(context);
         m_requirement = requirement;
+        setTag(tag);
         init(context);
     }
 
@@ -36,6 +38,7 @@ public class RequirementListItem extends RelativeLayout {
         inflate(context, R.layout.tutorial_requirement_list_item, this);
         TextView nameText = (TextView)findViewById(R.id.tutorial_requirement_item);
         nameText.setText(m_requirement.getName());
+        // TODO: Display amount and unit
     }
 
     /**

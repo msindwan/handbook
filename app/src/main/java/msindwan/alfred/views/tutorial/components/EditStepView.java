@@ -61,10 +61,6 @@ public class EditStepView extends RelativeLayout {
         m_instructions.addTextChangedListener(onInstructionsChanged);
         m_title.addTextChangedListener(onTitleChanged);
 
-        for (int i = 0; i < m_step.getNumRequirements(); i++) {
-            addRequirementListItem(new RequirementListItem(getContext(), m_step.getRequirement(i)));
-        }
-
         Accordion.Panel parent = (Accordion.Panel)getTag();
         m_removeButton.setTag(parent);
         m_moveUpButton.setTag(parent);
