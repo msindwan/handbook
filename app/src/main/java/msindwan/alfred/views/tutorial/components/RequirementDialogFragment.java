@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import msindwan.alfred.R;
@@ -52,6 +53,7 @@ public class RequirementDialogFragment extends DialogFragment {
         final EditText nameText = (EditText)view.findViewById(R.id.requirement_name);
         final EditText unitText = (EditText)view.findViewById(R.id.requirement_unit);
         final EditText amountText = (EditText)view.findViewById(R.id.requirement_amount);
+        final CheckBox chkOptional = (CheckBox)view.findViewById(R.id.requirement_optional);
         // TODO: Show checkbox for optional
 
         // Create the dialog.
@@ -83,7 +85,14 @@ public class RequirementDialogFragment extends DialogFragment {
                             return;
                         }
 
+                        if (amount.isEmpty() && !unit.isEmpty()) {
+                            amountText.setError("Amount is required");
+                            return;
+                        }
+
                         requirement.setName(name);
+                        requirement.setOptional(chkOptional.isChecked());
+
                         if (!unit.isEmpty()) {
                             requirement.setUnit(unit);
                         }

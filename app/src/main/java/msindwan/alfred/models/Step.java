@@ -235,10 +235,20 @@ public class Step implements Parcelable {
         return m_requirements.remove(requirement);
     }
 
+    /**
+     * Setter for the deleted flag.
+     *
+     * @param deleted the deleted flag to set.
+     */
     public void setDeleted(Boolean deleted) {
         m_deleted = deleted;
     }
 
+    /**
+     * Getter for the deleted flag.
+     *
+     * @return the deleted flag.
+     */
     public Boolean isDeleted() {
         return m_deleted;
     }

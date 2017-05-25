@@ -137,12 +137,12 @@ public class Tutorial implements Parcelable {
     }
 
     /**
-     * Setter for the description.
+     * Setter for the name.
      *
-     * @param description The description to set.
+     * @param name The name to set.
      */
-    public void setDescription(String description) {
-        m_description = description;
+    public void setName(String name) {
+        m_name = name;
     }
 
     /**
@@ -155,12 +155,12 @@ public class Tutorial implements Parcelable {
     }
 
     /**
-     * Setter for the name.
+     * Setter for the description.
      *
-     * @param name The name to set.
+     * @param description The description to set.
      */
-    public void setName(String name) {
-        m_name = name;
+    public void setDescription(String description) {
+        m_description = description;
     }
 
     /**

@@ -1,8 +1,10 @@
 package msindwan.alfred.views.dashboard.components;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.support.v4.app.LoaderManager;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -26,7 +29,9 @@ import java.util.Locale;
 
 import msindwan.alfred.R;
 import msindwan.alfred.data.DataContentProvider;
+import msindwan.alfred.data.DatabaseHelper;
 import msindwan.alfred.data.schema.TutorialTable;
+import msindwan.alfred.models.Tutorial;
 import msindwan.alfred.views.tutorial.TutorialEditor;
 
 /**
@@ -80,10 +85,20 @@ public class TutorialListFragment
         public View getView(final int position, View convertView, ViewGroup parent) {
             final View view = super.getView(position, convertView, parent);
 
+            // Set the view tag as the item ID.
             Cursor cursor = (Cursor)m_adapter.getItem(position);
             long id = cursor.getLong(cursor.getColumnIndex(TutorialTable.COL_ID));
             view.setTag(id);
 
+            // Bind the event listeners.
+            ImageButton menuButton =
+                    (ImageButton)view.findViewById(R.id.dashboard_list_item_menu_button);
+            menuButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getActivity().openContextMenu(view);
+                }
+            });
             return view;
         }
     }
@@ -154,14 +169,33 @@ public class TutorialListFragment
 
         switch (item.getItemId()) {
             case R.id.dashboard_list_item_menu_edit:
+                // Create an editor intent provided the tutorial id.
                 Intent intent = new Intent(getContext(), TutorialEditor.class);
                 intent.putExtra("tutorial_id", Long.toString(id));
                 startActivity(intent);
                 return true;
+
             case R.id.dashboard_list_item_menu_share:
                 break;
+
             case R.id.dashboard_list_item_menu_delete:
-                break;
+                DatabaseHelper helper = DatabaseHelper.getInstance(getContext());
+                SQLiteDatabase db = helper.getWritableDatabase();
+
+                Tutorial tutorial = new Tutorial();
+                tutorial.setId(id);
+
+                // Delete the tutorial.
+                db.beginTransaction();
+                {
+                    helper.delete(tutorial);
+                    db.setTransactionSuccessful();
+                }
+                db.endTransaction();
+
+                ContentResolver resolver = getActivity().getContentResolver();
+                resolver.notifyChange(DataContentProvider.TUTORIAL_URI, null);
+                return true;
         }
 
         return super.onContextItemSelected(item);

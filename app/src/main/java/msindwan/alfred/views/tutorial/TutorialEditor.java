@@ -2,6 +2,7 @@ package msindwan.alfred.views.tutorial;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -68,7 +69,24 @@ public class TutorialEditor extends AppCompatActivity {
                 return true;
 
             case R.id.tutorial_editor_save:
-                // TODO: Validate each panel and save the tutorial.
+                // Validate the summary.
+                Accordion.Panel panel = m_accordion.getPanel(0);
+                EditSummaryView summaryView = (EditSummaryView)panel.getPanelView();
+                if (!summaryView.validate()) {
+                    m_accordion.setActivePanel(panel);
+                    return true;
+                }
+
+                // Validate each panel.
+                for (int i = 1; i < m_accordion.getNumPanels(); i++) {
+                    panel = m_accordion.getPanel(i);
+                    EditStepView editView = (EditStepView)panel.getPanelView();
+                    if (!editView.validate()) {
+                        m_accordion.setActivePanel(panel);
+                        return true;
+                    }
+                }
+
                 final ProgressDialog progress = new ProgressDialog(this);
                 progress.setMessage("Saving Tutorial");
                 progress.show();
@@ -77,13 +95,19 @@ public class TutorialEditor extends AppCompatActivity {
                     @Override
                     public void run() {
                         DatabaseHelper helper = DatabaseHelper.getInstance(TutorialEditor.this);
+                        SQLiteDatabase db = helper.getWritableDatabase();
 
                         // TODO: Handle insert / update errors.
-                        if (m_tutorial.getId() == null) {
-                            helper.insert(m_tutorial);
-                        } else {
-                            helper.update(m_tutorial);
+                        db.beginTransaction();
+                        {
+                            if (m_tutorial.getId() == null) {
+                                helper.insert(m_tutorial);
+                            } else {
+                                helper.update(m_tutorial);
+                            }
+                            db.setTransactionSuccessful();
                         }
+                        db.endTransaction();
 
                         // Notify the content provider.
                         ContentResolver resolver = getContentResolver();

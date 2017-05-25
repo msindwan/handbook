@@ -152,6 +152,26 @@ public class EditStepView extends RelativeLayout {
     }
 
     /**
+     * Validates the step and sets text field errors.
+     *
+     * @return True if valid; false otherwise.
+     */
+    public boolean validate() {
+        String title = m_step.getTitle();
+        String instructions = m_step.getInstructions();
+
+        if (title == null || title.isEmpty()) {
+            m_title.setError("Name is Required");
+            return false;
+        }
+        if (instructions == null || instructions.isEmpty()) {
+            m_instructions.setError("Description is Required");
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Listener for title changes.
      */
     private TextWatcher onTitleChanged = new TextWatcher() {

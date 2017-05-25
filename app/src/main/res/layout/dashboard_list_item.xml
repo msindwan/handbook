@@ -3,39 +3,57 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="8dp"
-    android:orientation="vertical">
-
-    <TextView
-        android:textColor="@android:color/black"
-        android:paddingBottom="4dp"
-        android:id="@+id/dashboard_list_item_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/tutorial_name" />
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="horizontal">
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_width="0dp"
         android:layout_height="wrap_content">
 
         <TextView
-            android:paddingEnd="5dp"
-            android:paddingStart="0dp"
-            android:paddingLeft="0dp"
-            android:paddingRight="5dp"
+            android:textColor="@android:color/black"
+            android:paddingBottom="4dp"
+            android:id="@+id/dashboard_list_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/last_modified"
-            android:textAllCaps="false"
-            android:textSize="12sp" />
+            android:text="@string/tutorial_name" />
 
-        <TextView
-            android:id="@+id/dashboard_list_item_subtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:textSize="12sp" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:paddingEnd="5dp"
+                android:paddingStart="0dp"
+                android:paddingLeft="0dp"
+                android:paddingRight="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/last_modified"
+                android:textAllCaps="false"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/dashboard_list_item_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAllCaps="false"
+                android:textSize="12sp" />
+
+        </LinearLayout>
 
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/dashboard_list_item_menu_button"
+        android:contentDescription="@string/more"
+        android:tint="@color/colorSecondary"
+        android:src="@mipmap/ic_more_vert_black_24dp"
+        android:background="@android:color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

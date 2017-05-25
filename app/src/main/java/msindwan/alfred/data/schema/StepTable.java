@@ -62,7 +62,7 @@ public class StepTable {
                 ) +
                 String.format(
                         Locale.getDefault(),
-                        "FOREIGN KEY(%s) REFERENCES %s(%s));",
+                        "FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE);",
                         COL_TUTORIAL_ID,
                         TutorialTable.TABLE_NAME,
                         TutorialTable.COL_ID

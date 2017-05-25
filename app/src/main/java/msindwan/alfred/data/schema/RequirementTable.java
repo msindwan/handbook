@@ -70,7 +70,7 @@ public class RequirementTable {
                 ) +
                 String.format(
                         Locale.getDefault(),
-                        "FOREIGN KEY(%s) REFERENCES %s(%s));",
+                        "FOREIGN KEY(%s) REFERENCES %s(%s) ON DELETE CASCADE);",
                         COL_STEP_ID,
                         StepTable.TABLE_NAME,
                         StepTable.COL_ID

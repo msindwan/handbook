@@ -48,6 +48,26 @@ public class EditSummaryView extends RelativeLayout {
         m_description.addTextChangedListener(onDescriptionChanged);
     }
 
+    /**
+     * Validates the tutorial and sets text field errors.
+     *
+     * @return True if valid; false otherwise.
+     */
+    public boolean validate() {
+        String name = m_tutorial.getName();
+        String description = m_tutorial.getDescription();
+
+        if (name == null || name.isEmpty()) {
+            m_name.setError("Title is Required");
+            return false;
+        }
+        if (description == null || description.isEmpty()) {
+            m_description.setError("Instructions are Required");
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * Listener for name changes.

@@ -37,8 +37,33 @@ public class RequirementListItem extends RelativeLayout {
     private void init(Context context) {
         inflate(context, R.layout.tutorial_requirement_list_item, this);
         TextView nameText = (TextView)findViewById(R.id.tutorial_requirement_item);
-        nameText.setText(m_requirement.getName());
-        // TODO: Display amount and unit
+
+        // Get the requirement fields.
+        String title = m_requirement.getName();
+        Double amount = m_requirement.getAmount();
+        String unit = m_requirement.getUnit();
+
+        if (amount != null && amount != 0) {
+            String sAmount = Double.toString(amount);
+
+            // Remove trailing zeros.
+            sAmount = !sAmount.contains(".") ?
+                    sAmount :
+                    sAmount.replaceAll("0*$", "").replaceAll("\\.$", "");
+
+            title += (" - " + sAmount);
+
+            // Append a unit (if any).
+            if (unit != null) {
+                title += (" " + unit);
+            }
+        }
+
+        if (m_requirement.isOptional()) {
+            title += " (optional)";
+        }
+
+        nameText.setText(title);
     }
 
     /**
