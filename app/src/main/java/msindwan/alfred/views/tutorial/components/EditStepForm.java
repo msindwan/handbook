@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 
 import msindwan.alfred.R;
 import msindwan.alfred.models.Step;
+import msindwan.alfred.views.common.FormView;
 import msindwan.alfred.views.widgets.Accordion;
 
 /**
@@ -20,7 +21,7 @@ import msindwan.alfred.views.widgets.Accordion;
  * StepView:
  * Defines a view that edits a step in a tutorial.
  */
-public class EditStepView extends RelativeLayout {
+public class EditStepForm extends RelativeLayout implements FormView {
 
     private Button m_addRequirementButton;
     private ImageButton m_moveDownButton;
@@ -33,7 +34,7 @@ public class EditStepView extends RelativeLayout {
     private Step m_step;
 
     // Constructors.
-    public EditStepView(Context context, Step step, View tag) {
+    public EditStepForm(Context context, Step step, View tag) {
         super(context);
         m_step = step;
         setTag(tag);
@@ -156,16 +157,19 @@ public class EditStepView extends RelativeLayout {
      *
      * @return True if valid; false otherwise.
      */
+    @Override
     public boolean validate() {
         String title = m_step.getTitle();
         String instructions = m_step.getInstructions();
 
         if (title == null || title.isEmpty()) {
-            m_title.setError("Name is Required");
+            m_title.requestFocus();
+            m_title.setError("Title is Required");
             return false;
         }
         if (instructions == null || instructions.isEmpty()) {
-            m_instructions.setError("Description is Required");
+            m_instructions.requestFocus();
+            m_instructions.setError("Instructions are Required");
             return false;
         }
         return true;

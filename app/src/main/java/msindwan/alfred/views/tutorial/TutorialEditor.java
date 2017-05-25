@@ -18,10 +18,11 @@ import msindwan.alfred.models.Requirement;
 import msindwan.alfred.models.Step;
 import msindwan.alfred.models.Tutorial;
 import msindwan.alfred.R;
+import msindwan.alfred.views.common.FormView;
 import msindwan.alfred.views.tutorial.components.RequirementDialogFragment;
 import msindwan.alfred.views.tutorial.components.RequirementListItem;
-import msindwan.alfred.views.tutorial.components.EditStepView;
-import msindwan.alfred.views.tutorial.components.EditSummaryView;
+import msindwan.alfred.views.tutorial.components.EditStepForm;
+import msindwan.alfred.views.tutorial.components.EditSummaryForm;
 import msindwan.alfred.views.widgets.Accordion;
 
 /**
@@ -69,19 +70,11 @@ public class TutorialEditor extends AppCompatActivity {
                 return true;
 
             case R.id.tutorial_editor_save:
-                // Validate the summary.
-                Accordion.Panel panel = m_accordion.getPanel(0);
-                EditSummaryView summaryView = (EditSummaryView)panel.getPanelView();
-                if (!summaryView.validate()) {
-                    m_accordion.setActivePanel(panel);
-                    return true;
-                }
-
                 // Validate each panel.
-                for (int i = 1; i < m_accordion.getNumPanels(); i++) {
-                    panel = m_accordion.getPanel(i);
-                    EditStepView editView = (EditStepView)panel.getPanelView();
-                    if (!editView.validate()) {
+                for (int i = 0; i < m_accordion.getNumPanels(); i++) {
+                    Accordion.Panel panel = m_accordion.getPanel(i);
+                    FormView editPanel = (FormView) panel.getPanelView();
+                    if (!editPanel.validate()) {
                         m_accordion.setActivePanel(panel);
                         return true;
                     }
@@ -177,7 +170,7 @@ public class TutorialEditor extends AppCompatActivity {
 
         // Add the summary panel.
         Accordion.Panel panel = new Accordion.Panel(this);
-        EditSummaryView summary = new EditSummaryView(this, m_tutorial, panel);
+        EditSummaryForm summary = new EditSummaryForm(this, m_tutorial, panel);
         panel.setPanelView(summary);
         panel.setTitle("Summary");
         m_accordion.addPanel(panel);
@@ -186,7 +179,7 @@ public class TutorialEditor extends AppCompatActivity {
         for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
             Step step = m_tutorial.getStep(i);
             Accordion.Panel view = addStepView(step);
-            EditStepView stepVew = (EditStepView)view.getPanelView();
+            EditStepForm stepVew = (EditStepForm)view.getPanelView();
 
             // Add requirement list items.
             for (int j = 0; j < step.getNumRequirements(); j++) {
@@ -214,31 +207,31 @@ public class TutorialEditor extends AppCompatActivity {
             panel.setTitle(String.format(Locale.getDefault(), "Step %d", i));
         }
 
-        EditStepView view;
+        EditStepForm view;
 
         // Adjust move buttons according to the index and the number of panels.
         if (m_accordion.getNumPanels() > 2) {
 
             // Disable the "move up" button for the first panel.
-            view = (EditStepView)m_accordion.getPanel(1).getPanelView();
+            view = (EditStepForm)m_accordion.getPanel(1).getPanelView();
             view.toggleMoveUpButton(false);
             view.toggleMoveDownButton(true);
 
             // Disable the move down button for the last panel.
-            view = (EditStepView)m_accordion.getPanel(m_accordion.getNumPanels() - 1).getPanelView();
+            view = (EditStepForm)m_accordion.getPanel(m_accordion.getNumPanels() - 1).getPanelView();
             view.toggleMoveUpButton(true);
             view.toggleMoveDownButton(false);
 
             // Enable both buttons for the views between the first and last step.
             for (int i = 2; i < m_accordion.getNumPanels() - 1; i++) {
-                view = (EditStepView)m_accordion.getPanel(i).getPanelView();
+                view = (EditStepForm)m_accordion.getPanel(i).getPanelView();
                 view.toggleMoveUpButton(true);
                 view.toggleMoveDownButton(true);
             }
 
         } else if (m_accordion.getNumPanels() == 2) {
             // If only one step is present, disable movement.
-            view = (EditStepView)m_accordion.getPanel(1).getPanelView();
+            view = (EditStepForm)m_accordion.getPanel(1).getPanelView();
             view.toggleMoveUpButton(false);
             view.toggleMoveDownButton(false);
         }
@@ -252,7 +245,7 @@ public class TutorialEditor extends AppCompatActivity {
     private Accordion.Panel addStepView(Step step) {
         // Create the views.
         Accordion.Panel panel = new Accordion.Panel(this);
-        EditStepView stepView = new EditStepView(this, step, panel);
+        EditStepForm stepView = new EditStepForm(this, step, panel);
 
         // Bind listeners.
         stepView.setOnAddRequirementListener(onAddRequirement);
@@ -273,7 +266,7 @@ public class TutorialEditor extends AppCompatActivity {
      */
     private void removeStepView(Accordion.Panel panel) {
         // Find the corresponding step index.
-        Step step = ((EditStepView)panel.getPanelView()).getStep();
+        Step step = ((EditStepForm)panel.getPanelView()).getStep();
 
         // Remove the parent panel and its corresponding step.
         m_accordion.removePanel(panel);
@@ -294,8 +287,8 @@ public class TutorialEditor extends AppCompatActivity {
      */
     private void movePanel(Accordion.Panel panel, int newIndex) {
         Accordion.Panel nextPanel = m_accordion.getPanel(newIndex);
-        Step a = ((EditStepView)panel.getPanelView()).getStep();
-        Step b = ((EditStepView)nextPanel.getPanelView()).getStep();
+        Step a = ((EditStepForm)panel.getPanelView()).getStep();
+        Step b = ((EditStepForm)nextPanel.getPanelView()).getStep();
 
         m_accordion.movePanel(panel, newIndex);
         m_tutorial.swapSteps(a.getIndex().intValue(), b.getIndex().intValue());
@@ -368,7 +361,7 @@ public class TutorialEditor extends AppCompatActivity {
         @Override
         public void onSubmit(int stepIndex, final Requirement requirement) {
             // Add the new requirement.
-            final EditStepView view = (EditStepView)m_accordion.getPanel(stepIndex + 1).getPanelView();
+            final EditStepForm view = (EditStepForm)m_accordion.getPanel(stepIndex + 1).getPanelView();
             final RequirementListItem item = new RequirementListItem(TutorialEditor.this, requirement, view);
             item.setRequirementOnRemoveListener(onRequirementRemoved);
             view.getStep().addRequirement(requirement);
@@ -384,7 +377,7 @@ public class TutorialEditor extends AppCompatActivity {
         public void onClick(View v) {
             // Remove the requirement from the step and view.
             RequirementListItem item = (RequirementListItem) v.getTag();
-            EditStepView view = (EditStepView)item.getTag();
+            EditStepForm view = (EditStepForm)item.getTag();
 
             Requirement requirement = item.getRequirement();
             Step step = view.getStep();

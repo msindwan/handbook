@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 
 import msindwan.alfred.R;
 import msindwan.alfred.models.Tutorial;
+import msindwan.alfred.views.common.FormView;
 
 /**
  * Created by Mayank Sindwani on 2017-05-21.
@@ -16,14 +17,14 @@ import msindwan.alfred.models.Tutorial;
  * SummaryView:
  * Defines a view representing a tutorial's summary.
  */
-public class EditSummaryView extends RelativeLayout {
+public class EditSummaryForm extends RelativeLayout implements FormView {
 
     private EditText m_name;
     private EditText m_description;
     private Tutorial m_tutorial;
 
     // Constructors.
-    public EditSummaryView(Context context, Tutorial tutorial, View tag) {
+    public EditSummaryForm(Context context, Tutorial tutorial, View tag) {
         super(context);
         m_tutorial = tutorial;
         setTag(tag);
@@ -53,16 +54,19 @@ public class EditSummaryView extends RelativeLayout {
      *
      * @return True if valid; false otherwise.
      */
+    @Override
     public boolean validate() {
         String name = m_tutorial.getName();
         String description = m_tutorial.getDescription();
 
         if (name == null || name.isEmpty()) {
-            m_name.setError("Title is Required");
+            m_name.requestFocus();
+            m_name.setError("Name is Required");
             return false;
         }
         if (description == null || description.isEmpty()) {
-            m_description.setError("Instructions are Required");
+            m_description.requestFocus();
+            m_description.setError("Description is Required");
             return false;
         }
         return true;
