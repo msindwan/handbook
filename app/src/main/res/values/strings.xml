@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Alfred</string>
+    <string name="app_name">Handbook</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">OK</string>
     <string name="add_step">Add Step</string>
@@ -24,4 +24,5 @@
     <string name="add_requirement">Add Requirement</string>
     <string name="instructions">Instructions</string>
     <string name="optional">Mark as Optional</string>
+    <string name="none">None</string>
 </resources>

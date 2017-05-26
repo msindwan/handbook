@@ -1,29 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<LinearLayout
+    android:id="@+id/tutorial_editor"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".views.tutorial.TutorialEditor">
 
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:id="@+id/tutorial_viewer_tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-        </LinearLayout>
-
-    </ScrollView>
-
-    <LinearLayout
-        android:orientation="vertical"
+    <msindwan.handbook.views.widgets.Accordion
+        android:id="@+id/tutorial_panels"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-    </LinearLayout>
+        android:layout_height="match_parent" />
 
 </LinearLayout>
