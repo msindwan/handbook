@@ -9,7 +9,7 @@ import android.widget.RelativeLayout;
 
 import msindwan.handbook.R;
 import msindwan.handbook.models.Tutorial;
-import msindwan.handbook.views.common.FormView;
+import msindwan.handbook.views.common.EditFormView;
 
 /**
  * Created by Mayank Sindwani on 2017-05-21.
@@ -17,7 +17,7 @@ import msindwan.handbook.views.common.FormView;
  * SummaryView:
  * Defines a view representing a tutorial's summary.
  */
-public class EditSummaryForm extends RelativeLayout implements FormView {
+public class EditSummaryForm extends RelativeLayout implements EditFormView {
 
     private EditText m_name;
     private EditText m_description;

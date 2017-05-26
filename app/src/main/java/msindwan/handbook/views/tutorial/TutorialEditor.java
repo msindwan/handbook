@@ -18,7 +18,7 @@ import msindwan.handbook.models.Requirement;
 import msindwan.handbook.models.Step;
 import msindwan.handbook.models.Tutorial;
 import msindwan.handbook.R;
-import msindwan.handbook.views.common.FormView;
+import msindwan.handbook.views.common.EditFormView;
 import msindwan.handbook.views.tutorial.components.RequirementDialogFragment;
 import msindwan.handbook.views.tutorial.components.RequirementListItem;
 import msindwan.handbook.views.tutorial.components.EditStepForm;
@@ -73,7 +73,7 @@ public class TutorialEditor extends AppCompatActivity {
                 // Validate each panel.
                 for (int i = 0; i < m_accordion.getNumPanels(); i++) {
                     Accordion.Panel panel = m_accordion.getPanel(i);
-                    FormView editPanel = (FormView) panel.getPanelView();
+                    EditFormView editPanel = (EditFormView) panel.getPanelView();
                     if (!editPanel.validate()) {
                         m_accordion.setActivePanel(panel);
                         return true;

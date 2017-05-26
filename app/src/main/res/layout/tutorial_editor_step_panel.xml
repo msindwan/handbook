@@ -55,16 +55,16 @@
     </LinearLayout>
 
     <TextView
+        android:textColor="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingTop="10dp"
+        android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:text="@string/title"
         android:textAllCaps="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textStyle="bold" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     <EditText
         android:inputType="text"
@@ -78,6 +78,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     <TextView
+        android:textColor="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
@@ -86,8 +87,7 @@
         android:paddingBottom="5dp"
         android:text="@string/requirements"
         android:textAllCaps="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textStyle="bold" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     <LinearLayout
         android:id="@+id/tutorial_editor_requirements"
@@ -107,6 +107,7 @@
         android:layout_height="wrap_content" />
 
     <TextView
+        android:textColor="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
@@ -115,8 +116,7 @@
         android:paddingBottom="5dp"
         android:text="@string/instructions"
         android:textAllCaps="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textStyle="bold" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     <EditText
         android:saveEnabled="false"

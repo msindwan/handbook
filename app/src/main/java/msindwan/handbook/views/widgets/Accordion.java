@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -36,6 +37,7 @@ public class Accordion extends RelativeLayout {
      */
     public static class Panel extends RelativeLayout {
 
+        // TODO: For completeness, make colour properties configurable.
         // View components.
         private LinearLayout m_panelLayout;
         private LinearLayout m_panelHeader;
@@ -63,29 +65,32 @@ public class Accordion extends RelativeLayout {
             m_title = (TextView)findViewById(R.id.accordion_panel_header_title);
             m_panelView = null;
 
-            m_panelLayout.getViewTreeObserver()
-                .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        m_height = m_panelLayout.getMeasuredHeight();
-                        if (!m_active) {
-                            m_panelLayout.setLayoutParams(
-                                new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.MATCH_PARENT,
-                                    0
-                                )
-                            );
-                        }
+            // Listen for global layout changes. Once the panel is rendered,
+            // determine the measured height and hide the layout if it isn't
+            // active.
+            final ViewTreeObserver viewTreeObserver = m_panelLayout.getViewTreeObserver();
 
-                        final ViewTreeObserver viewTreeObserver = m_panelLayout.getViewTreeObserver();
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                            viewTreeObserver.removeOnGlobalLayoutListener(this);
-                        } else {
-                            //noinspection deprecation
-                            viewTreeObserver.removeGlobalOnLayoutListener(this);
-                        }
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    m_height = m_panelLayout.getMeasuredHeight();
+                    if (!m_active) {
+                        m_panelLayout.setLayoutParams(
+                            new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                0
+                            )
+                        );
                     }
-                });
+                    // Remove the listener.
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        viewTreeObserver.removeOnGlobalLayoutListener(this);
+                    } else {
+                        //noinspection deprecation
+                        viewTreeObserver.removeGlobalOnLayoutListener(this);
+                    }
+                }
+            });
 
         }
 
@@ -103,7 +108,11 @@ public class Accordion extends RelativeLayout {
             return m_panelHeader;
         }
 
-
+        /**
+         * Sets the panel layout child container to the view specified.
+         *
+         * @param view The view to set as the child container for the panel
+         */
         public void setPanelView(View view) {
             // Add the specified view to the panel layout.
             getLayout().addView(view, new LinearLayout.LayoutParams(
@@ -113,10 +122,14 @@ public class Accordion extends RelativeLayout {
             m_panelView = view;
         }
 
+        /**
+         * Getter for the panel child container.
+         *
+         * @return The panel child container.
+         */
         public View getPanelView() {
             return m_panelView;
         }
-
 
         /**
          * Sets the title for the panel.
@@ -127,34 +140,45 @@ public class Accordion extends RelativeLayout {
         }
 
         /**
+         * Getter for the panel layout height.
          *
+         * @return the panel layout height.
+         */
+        public final int getPanelHeight() {
+            return m_height;
+        }
+
+        /**
+         * Activates the panel.
          */
         private void activate() {
             ImageView arrow = (ImageView)m_panelHeader.findViewById(R.id.accordion_panel_arrow);
+            arrow.setColorFilter(Color.WHITE);
+            arrow.animate().rotation(0).start();
+
             m_title.setTextColor(Color.WHITE);
             m_title.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-            m_panelHeader.setBackgroundColor(getResources().getColor(R.color.colorSecondaryAccent));
-            arrow.setColorFilter(Color.argb(255, 255, 255, 255));
-            arrow.animate().rotation(0).start();
+            m_panelHeader.setBackgroundColor(
+                ContextCompat.getColor(getContext(), R.color.colorAccent)
+            );
+
             m_active = true;
         }
 
         /**
-         *
+         * Deactivates the panel.
          */
         private void deactivate() {
             ImageView arrow = (ImageView)m_panelHeader.findViewById(R.id.accordion_panel_arrow);
-            m_title.setTextColor(Color.parseColor("#494949"));
-            m_title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-            m_panelHeader.setBackgroundColor(Color.parseColor("#ffffff"));
             arrow.setColorFilter(Color.BLACK);
             arrow.animate().rotation(-90).start();
+
+            m_title.setTextColor(Color.BLACK);
+            m_title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+            m_panelHeader.setBackgroundColor(Color.WHITE);
+
             m_active = false;
             m_height = m_panelLayout.getHeight();
-        }
-
-        public final int getPanelHeight() {
-            return m_height;
         }
 
     }
@@ -377,6 +401,12 @@ public class Accordion extends RelativeLayout {
         m_layout.addView(panel, index);
     }
 
+    /**
+     * Returns a value animator to collapse the specified panel.
+     *
+     * @param panel the panel to collapse.
+     * @return the value animator
+     */
     private ValueAnimator collapse(Panel panel) {
         final LinearLayout panelLayout = panel.getLayout();
         panel.deactivate();
@@ -397,6 +427,12 @@ public class Accordion extends RelativeLayout {
         return hideLayout;
     }
 
+    /**
+     * Returns a value animator to expand the specified panel.
+     *
+     * @param panel the panel to expand.
+     * @return the value animator
+     */
     private ValueAnimator expand(Panel panel) {
         final LinearLayout panelLayout = panel.getLayout();
         panel.activate();

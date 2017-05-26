@@ -115,7 +115,28 @@ public class TutorialViewer extends AppCompatActivity {
 
             // Create the views.
             panel = new Accordion.Panel(this);
-            StepForm stepView = new StepForm(this, step, panel);
+            final StepForm stepView = new StepForm(this, step, panel);
+
+            stepView.setPlayOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Step s = stepView.getStep();
+                    int state = (int)v.getTag();
+
+                    switch (state) {
+                        case 0:
+                            v.setTag(1);
+                            t1.speak(s.getTitle(), TextToSpeech.QUEUE_ADD, null);
+                            t1.speak(s.getInstructions(), TextToSpeech.QUEUE_ADD, null);
+                            break;
+                        case 1:
+                            v.setTag(0);
+                            t1.stop();
+                            break;
+                    }
+                }
+            });
+
             panel.setPanelView(stepView);
             m_accordion.addPanel(panel);
             panel.setTitle(
@@ -140,16 +161,11 @@ public class TutorialViewer extends AppCompatActivity {
         }
 
         m_accordion.setActivePanel(m_accordion.getPanel(activePanel));
-
         t1 = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if(status != TextToSpeech.ERROR) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        t1.speak(m_tutorial.getDescription(), TextToSpeech.QUEUE_FLUSH, null, null);
-                    } else {
-                        t1.speak(m_tutorial.getDescription(), TextToSpeech.QUEUE_FLUSH, null);
-                    }
+                    t1.setLanguage(Locale.getDefault());
                 }
             }
         });

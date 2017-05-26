@@ -10,14 +10,13 @@
 
     <LinearLayout
         android:id="@+id/accordion_panel_header"
+        android:background="@color/colorSecondaryAccent"
         android:clickable="true"
-        android:background="#c05a70"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
-            android:textColor="#494949"
             android:id="@+id/accordion_panel_header_title"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -27,9 +26,8 @@
             android:padding="15dp" />
 
         <ImageView
-            android:tint="@android:color/white"
             android:id="@+id/accordion_panel_arrow"
-            android:contentDescription="@string/edit"
+            android:contentDescription="@string/toggle"
             android:background="@android:color/transparent"
             android:padding="10dp"
             android:src="@mipmap/ic_arrow_drop_down_black_24dp"
@@ -39,12 +37,10 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/accordion_panel"
         android:background="@android:color/white"
+        android:id="@+id/accordion_panel"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    </LinearLayout>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
 
 import msindwan.handbook.R;
 import msindwan.handbook.models.Step;
-import msindwan.handbook.views.common.FormView;
+import msindwan.handbook.views.common.EditFormView;
 import msindwan.handbook.views.widgets.Accordion;
 
 /**
@@ -21,7 +21,7 @@ import msindwan.handbook.views.widgets.Accordion;
  * StepView:
  * Defines a view that edits a step in a tutorial.
  */
-public class EditStepForm extends RelativeLayout implements FormView {
+public class EditStepForm extends RelativeLayout implements EditFormView {
 
     private Button m_addRequirementButton;
     private ImageButton m_moveDownButton;

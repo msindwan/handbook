@@ -6,6 +6,7 @@ package msindwan.handbook.views.tutorial.components;
 
 import android.content.Context;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ public class StepForm extends RelativeLayout {
     private TextView m_title;
     private TextView m_instructions;
     private LinearLayout m_stepLayout;
+    private ImageButton m_play;
 
     private Step m_step;
 
@@ -45,6 +47,8 @@ public class StepForm extends RelativeLayout {
         m_title = (TextView)findViewById(R.id.tutorial_viewer_title);
         m_instructions = (TextView) findViewById(R.id.tutorial_viewer_instructions);
         m_stepLayout = (LinearLayout) findViewById(R.id.tutorial_viewer_requirements);
+        m_play = (ImageButton) findViewById(R.id.tutorial_viewer_play);
+
         m_title.setText(m_step.getTitle());
         m_instructions.setText(m_step.getInstructions());
     }
@@ -56,6 +60,10 @@ public class StepForm extends RelativeLayout {
      */
     public Step getStep() {
         return m_step;
+    }
+
+    public void setPlayOnClickListener(View.OnClickListener listener) {
+        m_play.setOnClickListener(listener);
     }
 
     /**

@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:label=""
+            android:label="Compose"
             android:name="msindwan.handbook.views.tutorial.TutorialEditor">
         </activity>
         <activity
