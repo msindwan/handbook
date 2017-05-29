@@ -11,6 +11,7 @@ import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -29,7 +30,15 @@ import msindwan.handbook.R;
  * Accordion:
  * Defines a custom accordion widget for android.
  */
-public class Accordion extends RelativeLayout {
+public class Accordion extends LinearLayout {
+
+    /**
+     * AccordionListener:
+     * Defines the interface for listening to accordion actions.
+     */
+    public interface AccordionListener {
+        boolean onHeaderClick(Panel panel);
+    }
 
     /**
      * Panel:
@@ -68,8 +77,7 @@ public class Accordion extends RelativeLayout {
             // Listen for global layout changes. Once the panel is rendered,
             // determine the measured height and hide the layout if it isn't
             // active.
-            final ViewTreeObserver viewTreeObserver = m_panelLayout.getViewTreeObserver();
-
+            ViewTreeObserver viewTreeObserver = m_panelLayout.getViewTreeObserver();
             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
@@ -84,10 +92,10 @@ public class Accordion extends RelativeLayout {
                     }
                     // Remove the listener.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        viewTreeObserver.removeOnGlobalLayoutListener(this);
+                        m_panelLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     } else {
                         //noinspection deprecation
-                        viewTreeObserver.removeGlobalOnLayoutListener(this);
+                        m_panelLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                     }
                 }
             });
@@ -133,10 +141,20 @@ public class Accordion extends RelativeLayout {
 
         /**
          * Sets the title for the panel.
+         *
          * @param title the title to set.
          */
         public void setTitle(String title) {
             m_title.setText(title);
+        }
+
+        /**
+         * Sets the title for the panel.
+         *
+         * @return the panel title.
+         */
+        public String getTitle() {
+            return m_title.getText().toString();
         }
 
         /**
@@ -159,7 +177,7 @@ public class Accordion extends RelativeLayout {
             m_title.setTextColor(Color.WHITE);
             m_title.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             m_panelHeader.setBackgroundColor(
-                ContextCompat.getColor(getContext(), R.color.colorAccent)
+                ContextCompat.getColor(getContext(), R.color.colorSecondaryAccent)
             );
 
             m_active = true;
@@ -233,8 +251,8 @@ public class Accordion extends RelativeLayout {
     }
 
     // View components.
+    private AccordionListener m_listener;
     private ArrayList<Panel> m_panels;
-    private LinearLayout m_layout;
     private int m_activePanel;
 
     // Constructors.
@@ -253,10 +271,13 @@ public class Accordion extends RelativeLayout {
      *
      * @param context The initialization context.
      */
-    private void init(Context context) {
-        inflate(context, R.layout.accordian, this);
-        m_layout = (LinearLayout)findViewById(R.id.accordion_panels);
+    private void init(@SuppressWarnings("UnusedParameters") Context context) {
         m_panels = new ArrayList<>();
+        setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        ));
+        setOrientation(LinearLayout.VERTICAL);
     }
 
     /**
@@ -281,24 +302,28 @@ public class Accordion extends RelativeLayout {
         panelHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setActivePanel(panel);
+                if (m_listener == null || m_listener.onHeaderClick(panel)) {
+                    setActivePanel(panel);
+                }
             }
         });
 
         if (!m_panels.isEmpty()) {
             // Deactivate and hide the panel.
             panel.deactivate();
+            panel.setPadding(10, 0, 10, 10);
         } else {
             // The first panel is activated by default.
             panel.activate();
             m_activePanel = 0;
+            panel.setPadding(10, 10, 10, 10);
         }
 
         // Add the panel.
         m_panels.add(panel);
-        m_layout.addView(panel, new RelativeLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.WRAP_CONTENT
+        addView(panel, new RelativeLayout.LayoutParams(
+            LayoutParams.MATCH_PARENT,
+            LayoutParams.WRAP_CONTENT
         ));
     }
 
@@ -335,7 +360,7 @@ public class Accordion extends RelativeLayout {
 
         // Remove the panel references.
         m_panels.remove(panel);
-        m_layout.removeView(panel);
+        removeView(panel);
 
         // Update the active panel.
         if (panelIndex == m_activePanel) {
@@ -397,8 +422,8 @@ public class Accordion extends RelativeLayout {
         }
         m_panels.set(panelIndex, m_panels.get(index));
         m_panels.set(index, panel);
-        m_layout.removeView(panel);
-        m_layout.addView(panel, index);
+        removeView(panel);
+        addView(panel, index);
     }
 
     /**
@@ -451,6 +476,10 @@ public class Accordion extends RelativeLayout {
         });
 
         return showNewLayout;
+    }
+
+    public void setAccordionListener(AccordionListener listener) {
+        m_listener = listener;
     }
 
 }

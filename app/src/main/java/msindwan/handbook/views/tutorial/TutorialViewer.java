@@ -1,13 +1,14 @@
 package msindwan.handbook.views.tutorial;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -117,26 +118,6 @@ public class TutorialViewer extends AppCompatActivity {
             panel = new Accordion.Panel(this);
             final StepForm stepView = new StepForm(this, step, panel);
 
-            stepView.setPlayOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Step s = stepView.getStep();
-                    int state = (int)v.getTag();
-
-                    switch (state) {
-                        case 0:
-                            v.setTag(1);
-                            t1.speak(s.getTitle(), TextToSpeech.QUEUE_ADD, null);
-                            t1.speak(s.getInstructions(), TextToSpeech.QUEUE_ADD, null);
-                            break;
-                        case 1:
-                            v.setTag(0);
-                            t1.stop();
-                            break;
-                    }
-                }
-            });
-
             panel.setPanelView(stepView);
             m_accordion.addPanel(panel);
             panel.setTitle(
@@ -156,6 +137,7 @@ public class TutorialViewer extends AppCompatActivity {
                         step.getRequirement(j),
                         stepView
                 );
+                item.toggleDeleteButton(false);
                 stepView.addRequirementListItem(item);
             }
         }
@@ -169,6 +151,65 @@ public class TutorialViewer extends AppCompatActivity {
                 }
             }
         });
+
+        final TextView tv = (TextView)findViewById(R.id.tutorial_viewer_step);
+        tv.setText(String.format(Locale.getDefault(), "%d/%d", activePanel, m_tutorial.getNumSteps()));
+
+        final ImageButton button = (ImageButton)findViewById(R.id.tutorial_viewer_play);
+        button.setTag(0);
+
+        m_accordion.setAccordionListener(new Accordion.AccordionListener() {
+            @Override
+            public boolean onHeaderClick(Accordion.Panel panel) {
+                int index = m_accordion.getPanelIndex(panel);
+                tv.setText(String.format(Locale.getDefault(), "%d/%d", index, m_tutorial.getNumSteps()));
+                t1.stop();
+                button.setTag(1);
+                button.setImageResource(R.mipmap.ic_play_arrow_black_24dp);
+                return true;
+            }
+        });
+
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int state = (int)v.getTag();
+                if (state == 0) {
+                    t1.stop();
+                    v.setTag(1);
+                    button.setImageResource(R.mipmap.ic_play_arrow_black_24dp);
+                } else {
+                    int panelIndex = m_accordion.getActivePanel();
+                    if (panelIndex == 0) {
+                        t1.speak(m_tutorial.getDescription(),TextToSpeech.QUEUE_ADD, null);
+                    } else {
+                        Step step = m_tutorial.getStep(panelIndex - 1);
+                        t1.speak(String.format(Locale.getDefault(), "Step %d.", panelIndex), TextToSpeech.QUEUE_ADD, null);
+                        t1.speak(step.getTitle(),TextToSpeech.QUEUE_ADD, null);
+                        t1.speak(step.getInstructions(), TextToSpeech.QUEUE_ADD, null);
+                    }
+                    v.setTag(0);
+                    button.setImageResource(R.mipmap.ic_stop_black_24dp);
+                }
+            }
+        });
+
+
+        // TODO: Update num views for tutorial
+        // TODO: Stop voice on finish
+        // TODO: Combine requirements for summary
+        // TODO: Speak requirements (if any)
+        // TODO: Accept voice commands to play, pause, etc
     }
 
+    @Override
+    protected void onStop() {
+        final ImageButton button = (ImageButton)findViewById(R.id.tutorial_viewer_play);
+        button.setTag(0);
+        t1.stop();
+        button.setTag(1);
+        button.setImageResource(R.mipmap.ic_play_arrow_black_24dp);
+        super.onStop();
+    }
 }

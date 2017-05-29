@@ -37,7 +37,6 @@ public class SummaryForm extends RelativeLayout {
      */
     private void init(Context context) {
         inflate(context, R.layout.tutorial_viewer_summary_panel, this);
-
         m_name = (TextView) findViewById(R.id.tutorial_viewer_name);
         m_description = (TextView) findViewById(R.id.tutorial_viewer_description);
 

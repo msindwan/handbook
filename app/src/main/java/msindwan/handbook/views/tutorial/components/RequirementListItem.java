@@ -19,7 +19,7 @@ import msindwan.handbook.models.Requirement;
 public class RequirementListItem extends RelativeLayout {
 
     private Requirement m_requirement;
-    private TextView m_name;
+    private Button m_deleteButton;
 
     // Constructors.
     public RequirementListItem(Context context, Requirement requirement, View tag) {
@@ -36,6 +36,7 @@ public class RequirementListItem extends RelativeLayout {
      */
     private void init(Context context) {
         inflate(context, R.layout.tutorial_requirement_list_item, this);
+        m_deleteButton = (Button)findViewById(R.id.tutorial_requirement_delete);
         TextView nameText = (TextView)findViewById(R.id.tutorial_requirement_item);
 
         // Get the requirement fields.
@@ -81,8 +82,17 @@ public class RequirementListItem extends RelativeLayout {
      * @param listener the listener to bind.
      */
     public void setRequirementOnRemoveListener(OnClickListener listener) {
-        Button deleteButton = (Button)findViewById(R.id.tutorial_requirement_delete);
-        deleteButton.setTag(this);
-        deleteButton.setOnClickListener(listener);
+        m_deleteButton.setTag(this);
+        m_deleteButton.setOnClickListener(listener);
+    }
+
+    /**
+     * Toggles the visibility of the delete button.
+     *
+     * @param toggle the flag to determine whether or not
+     *               to display the delete button
+     */
+    public void toggleDeleteButton(boolean toggle) {
+        m_deleteButton.setVisibility(toggle ? VISIBLE : GONE);
     }
 }
