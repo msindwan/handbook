@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-21.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.views.tutorial.components;
 
 import android.content.Context;
@@ -16,8 +23,6 @@ import msindwan.handbook.views.common.EditFormView;
 import msindwan.handbook.views.widgets.Accordion;
 
 /**
- * Created by Mayank Sindwani on 2017-05-21.
- *
  * StepView:
  * Defines a view that edits a step in a tutorial.
  */

@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-15.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.views.widgets;
 
 import android.animation.Animator;
@@ -25,8 +32,6 @@ import java.util.ArrayList;
 import msindwan.handbook.R;
 
 /**
- * Created by Mayank Sindwani on 2017-05-15.
- *
  * Accordion:
  * Defines a custom accordion widget for android.
  */

@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-03.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.views.dashboard.components;
 
 import android.content.ContentResolver;
@@ -37,8 +44,6 @@ import msindwan.handbook.views.tutorial.TutorialEditor;
 import msindwan.handbook.views.tutorial.TutorialViewer;
 
 /**
- * Created by Mayank Sindwani on 2017-05-03.
- *
  * TutorialListFragment:
  * Defines the list fragment for tutorials on the dashboard.
  */

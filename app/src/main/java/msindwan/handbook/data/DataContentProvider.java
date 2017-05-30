@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-11.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.data;
 
 import android.content.ContentProvider;
@@ -15,8 +22,6 @@ import java.util.Locale;
 import msindwan.handbook.data.schema.TutorialTable;
 
 /**
- * Created by Mayank Sindwani on 2017-05-11.
- *
  * DataContentProvider:
  * The data access layer for the application.
  */

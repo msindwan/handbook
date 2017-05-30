@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-21.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.data;
 
 import android.content.ContentValues;
@@ -14,8 +21,6 @@ import msindwan.handbook.models.Step;
 import msindwan.handbook.models.Tutorial;
 
 /**
- * Created by Mayank Sindwani on 2017-05-21.
- *
  * DatabaseHelper:
  * A SQLite wrapper for the application database.
  */

@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-18.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.models;
 
 import android.os.Parcel;
@@ -5,10 +12,7 @@ import android.os.Parcelable;
 
 import org.jetbrains.annotations.Contract;
 
-
 /**
- * Created by Mayank Sindwani on 2017-05-18.
- *
  * Requirement:
  * Represents the data in a requirement.
  */

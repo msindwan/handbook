@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-04.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.views.tutorial;
 
 import android.app.ProgressDialog;
@@ -26,8 +33,6 @@ import msindwan.handbook.views.tutorial.components.EditSummaryForm;
 import msindwan.handbook.views.widgets.Accordion;
 
 /**
- * Created by Mayank Sindwani on 2017-05-04.
- *
  * TutorialEditor:
  * Defines a view component for creating and editing tutorials.
  */

@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-04.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.views.dashboard;
 
 import android.content.Intent;
@@ -12,8 +19,6 @@ import msindwan.handbook.views.dashboard.components.TutorialTabPager;
 import msindwan.handbook.views.tutorial.TutorialEditor;
 
 /**
- * Created by Mayank Sindwani on 2017-05-04.
- *
  * Dashboard:
  * Defines the main activity.
  */

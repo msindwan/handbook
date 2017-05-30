@@ -1,8 +1,11 @@
-package msindwan.handbook.views.tutorial.components;
-
-/**
- * Created by Mayank Sindwani on 2017-05-25.
+/*
+ * Created by Mayank Sindwani on 2017-05-21.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
  */
+package msindwan.handbook.views.tutorial.components;
 
 import android.content.Context;
 import android.view.View;
@@ -15,8 +18,6 @@ import msindwan.handbook.R;
 import msindwan.handbook.models.Step;
 
 /**
- * Created by Mayank Sindwani on 2017-05-21.
- *
  * StepView:
  * Defines a view that edits a step in a tutorial.
  */

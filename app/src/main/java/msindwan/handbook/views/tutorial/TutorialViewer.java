@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-30.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.views.tutorial;
 
 import android.os.Bundle;
@@ -8,7 +15,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -46,12 +52,6 @@ public class TutorialViewer extends AppCompatActivity {
         outState.putInt("activePanel", m_accordion.getActivePanel());
         super.onSaveInstanceState(outState);
     }
-
-    //@Override
-    //public boolean onCreateOptionsMenu(Menu menu) {
-    //    getMenuInflater().inflate(R.menu.tutorial_editor_actionbar, menu);
-    //    return super.onCreateOptionsMenu(menu);
-    //}
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -197,19 +197,20 @@ public class TutorialViewer extends AppCompatActivity {
 
 
         // TODO: Update num views for tutorial
-        // TODO: Stop voice on finish
         // TODO: Combine requirements for summary
         // TODO: Speak requirements (if any)
         // TODO: Accept voice commands to play, pause, etc
+        // TODO: Add image support
+        // TODO: Enforce field length constraints
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         final ImageButton button = (ImageButton)findViewById(R.id.tutorial_viewer_play);
         button.setTag(0);
         t1.stop();
         button.setTag(1);
         button.setImageResource(R.mipmap.ic_play_arrow_black_24dp);
-        super.onStop();
+        super.onPause();
     }
 }

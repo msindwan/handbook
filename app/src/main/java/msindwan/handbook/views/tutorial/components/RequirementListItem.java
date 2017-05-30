@@ -1,3 +1,10 @@
+/*
+ * Created by Mayank Sindwani on 2017-05-20.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
 package msindwan.handbook.views.tutorial.components;
 
 import android.content.Context;
@@ -10,8 +17,6 @@ import msindwan.handbook.R;
 import msindwan.handbook.models.Requirement;
 
 /**
- * Created by Mayank Sindwani on 2017-05-20.
- *
  * RequirementListItem:
  * Defines a widget representing a single requirement item.
  */
