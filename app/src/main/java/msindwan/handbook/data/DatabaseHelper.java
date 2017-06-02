@@ -19,6 +19,7 @@ import msindwan.handbook.data.schema.TutorialTable;
 import msindwan.handbook.models.Requirement;
 import msindwan.handbook.models.Step;
 import msindwan.handbook.models.Tutorial;
+import msindwan.handbook.util.Time;
 
 /**
  * DatabaseHelper:
@@ -257,7 +258,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(TutorialTable.COL_NAME, tutorial.getName());
         values.put(TutorialTable.COL_DESCRIPTION, tutorial.getDescription());
-        // TODO: Add updated time.
+        values.put(TutorialTable.COL_LAST_MODIFIED, Time.now());
 
         db.update(
                 TutorialTable.TABLE_NAME,

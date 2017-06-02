@@ -5,7 +5,6 @@
 
     <TextView
         android:id="@+id/tutorial_viewer_name"
-        android:background="@drawable/row_divider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
@@ -29,6 +28,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     <TextView
+        android:id="@+id/tutorial_viewer_requirement_placeholder"
         android:textStyle="italic"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"

@@ -7,17 +7,17 @@
  */
 package msindwan.handbook.views.tutorial;
 
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-
-import java.util.Locale;
+import android.widget.Toast;
 
 import msindwan.handbook.data.DataContentProvider;
 import msindwan.handbook.data.DatabaseHelper;
@@ -31,6 +31,7 @@ import msindwan.handbook.views.tutorial.components.RequirementListItem;
 import msindwan.handbook.views.tutorial.components.EditStepForm;
 import msindwan.handbook.views.tutorial.components.EditSummaryForm;
 import msindwan.handbook.views.widgets.Accordion;
+import msindwan.handbook.views.widgets.AsyncProgressDialog;
 
 /**
  * TutorialEditor:
@@ -40,6 +41,7 @@ public class TutorialEditor extends AppCompatActivity {
 
     private static final int NUM_INITIAL_STEPS = 2;
 
+    private AsyncProgressDialog m_saveDialog;
     private Accordion m_accordion;
     private Tutorial m_tutorial;
 
@@ -58,12 +60,26 @@ public class TutorialEditor extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
+    /**
+     * Initialize the contents of the Activity's standard options menu.
+     *
+     * @param menu The options menu in which you place your items.
+     * @return You must return true for the menu to be displayed;
+     *         if you return false it will not be shown.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.tutorial_editor_actionbar, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * This hook is called whenever an item in your options menu is selected.
+     *
+     * @param item The menu item that was selected.
+     * @return boolean Return false to allow normal menu processing to
+     *         proceed, true to consume it here.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -84,46 +100,7 @@ public class TutorialEditor extends AppCompatActivity {
                         return true;
                     }
                 }
-
-                final ProgressDialog progress = new ProgressDialog(this);
-                progress.setMessage("Saving Tutorial");
-                progress.show();
-
-                final Thread t = new Thread() {
-                    @Override
-                    public void run() {
-                        DatabaseHelper helper = DatabaseHelper.getInstance(TutorialEditor.this);
-                        SQLiteDatabase db = helper.getWritableDatabase();
-
-                        // TODO: Handle insert / update errors.
-                        // TODO: Fix issue where state is deleted while saving
-                        db.beginTransaction();
-                        {
-                            if (m_tutorial.getId() == null) {
-                                helper.insert(m_tutorial);
-                            } else {
-                                helper.update(m_tutorial);
-                            }
-                            db.setTransactionSuccessful();
-                        }
-                        db.endTransaction();
-
-                        // Notify the content provider.
-                        ContentResolver resolver = getContentResolver();
-                        resolver.notifyChange(DataContentProvider.TUTORIAL_URI, null);
-
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        finish();
-                        progress.dismiss();
-                    }
-                };
-
-                t.start();
+                m_saveDialog.execute();
                 return true;
 
             case android.R.id.home:
@@ -139,7 +116,6 @@ public class TutorialEditor extends AppCompatActivity {
     /**
      * Initializes the component on mount.
      */
-    @SuppressWarnings("ConstantConditions")
     private void init(Bundle savedInstanceState) {
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -167,18 +143,33 @@ public class TutorialEditor extends AppCompatActivity {
                 DatabaseHelper helper = DatabaseHelper.getInstance(this);
                 helper.fetch(m_tutorial, Integer.parseInt(tutorial_id));
             }
+
+            m_saveDialog = new AsyncProgressDialog();
+            Bundle args = new Bundle();
+            args.putString(
+                AsyncProgressDialog.ARG_MESSAGE,
+                getResources().getString(R.string.summary)
+            );
+            m_saveDialog.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container, m_saveDialog).commit();
+
         } else {
             // Otherwise, retrieve the old state and render the view
             // accordingly.
             m_tutorial = savedInstanceState.getParcelable("tutorial");
             activePanel = savedInstanceState.getInt("activePanel", 0);
+            m_saveDialog = (AsyncProgressDialog)getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         }
+
+        m_saveDialog.setTask(onSave);
 
         // Add the summary panel.
         Accordion.Panel panel = new Accordion.Panel(this);
         EditSummaryForm summary = new EditSummaryForm(this, m_tutorial, panel);
         panel.setPanelView(summary);
-        panel.setTitle("Summary");
+        panel.setTitle(getResources().getString(R.string.summary));
         m_accordion.addPanel(panel);
 
         // Add step views.
@@ -210,7 +201,9 @@ public class TutorialEditor extends AppCompatActivity {
         // Set the panel titles based on the index.
         for (int i = 1; i < m_accordion.getNumPanels(); i++) {
             Accordion.Panel panel = m_accordion.getPanel(i);
-            panel.setTitle(String.format(Locale.getDefault(), "Step %d", i));
+            panel.setTitle(
+                getResources().getString(R.string.nth_step_no_title, i)
+            );
         }
 
         EditStepForm view;
@@ -301,8 +294,6 @@ public class TutorialEditor extends AppCompatActivity {
         repaintStepViews();
     }
 
-    // Event Handlers.
-
     /**
      * Listener for removing a step view.
      */
@@ -350,7 +341,7 @@ public class TutorialEditor extends AppCompatActivity {
             // Find the step index and pass it as an argument to the dialog.
             int stepIndex = m_accordion.getPanelIndex(panel) - 1;
             Bundle bundle = new Bundle();
-            bundle.putInt("stepIndex", stepIndex);
+            bundle.putInt(RequirementDialogFragment.ARG_STEP_INDEX, stepIndex);
             dialog.setArguments(bundle);
 
             // Set the requirement dialog listener.
@@ -370,6 +361,21 @@ public class TutorialEditor extends AppCompatActivity {
             final EditStepForm view = (EditStepForm)m_accordion.getPanel(stepIndex + 1).getPanelView();
             final RequirementListItem item = new RequirementListItem(TutorialEditor.this, requirement, view);
             item.setRequirementOnRemoveListener(onRequirementRemoved);
+
+            Step step = view.getStep();
+
+            for (int i = 0; i < step.getNumRequirements(); i++) {
+                // Look for existing requirements that have the same unit and amount.
+                Requirement r = step.getRequirement(i);
+                if (r.getUnit().equals(requirement.getUnit()) && r.getName().equals(requirement.getName())) {
+                    if (r.getAmount() != null && requirement.getAmount() != null) {
+                        r.setAmount(r.getAmount() + requirement.getAmount());
+                        view.getRequirementListItem(i).paint();
+                        return;
+                    }
+                }
+            }
+
             view.getStep().addRequirement(requirement);
             view.addRequirementListItem(item);
         }
@@ -396,6 +402,50 @@ public class TutorialEditor extends AppCompatActivity {
                 step.removeRequirement(requirement);
             }
             view.removeRequirementListItem(item);
+        }
+    };
+
+    /**
+     * AsyncProgressDialog Task for saving tutorials.
+     */
+    private AsyncProgressDialog.AsyncDialogTask onSave = new AsyncProgressDialog.AsyncDialogTask() {
+        @Override
+        public void run() {
+            DatabaseHelper helper = DatabaseHelper.getInstance(TutorialEditor.this);
+            SQLiteDatabase db = helper.getWritableDatabase();
+            db.beginTransaction();
+
+            try {
+                if (m_tutorial.getId() == null) {
+                    helper.insert(m_tutorial);
+                } else {
+                    helper.update(m_tutorial);
+                }
+                db.setTransactionSuccessful();
+                db.endTransaction();
+
+                // Notify the content provider.
+                ContentResolver resolver = getContentResolver();
+                resolver.notifyChange(DataContentProvider.TUTORIAL_URI, null);
+
+                // Show the modal for an additional second to emphasize
+                // UI responsiveness.
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                finish();
+
+            } catch (SQLException e) {
+                Log.e(getResources().getString(R.string.app_name), "exception", e);
+                db.endTransaction();
+                Toast.makeText(
+                    TutorialEditor.this,
+                    getResources().getString(R.string.failed_tutorial_save),
+                    Toast.LENGTH_SHORT
+                ).show();
+            }
         }
     };
 }

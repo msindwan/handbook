@@ -20,7 +20,6 @@ import msindwan.handbook.models.Requirement;
  * RequirementListItem:
  * Defines a widget representing a single requirement item.
  */
-@SuppressWarnings("unused")
 public class RequirementListItem extends RelativeLayout {
 
     private Requirement m_requirement;
@@ -42,34 +41,7 @@ public class RequirementListItem extends RelativeLayout {
     private void init(Context context) {
         inflate(context, R.layout.tutorial_requirement_list_item, this);
         m_deleteButton = (Button)findViewById(R.id.tutorial_requirement_delete);
-        TextView nameText = (TextView)findViewById(R.id.tutorial_requirement_item);
-
-        // Get the requirement fields.
-        String title = m_requirement.getName();
-        Double amount = m_requirement.getAmount();
-        String unit = m_requirement.getUnit();
-
-        if (amount != null && amount != 0) {
-            String sAmount = Double.toString(amount);
-
-            // Remove trailing zeros.
-            sAmount = !sAmount.contains(".") ?
-                    sAmount :
-                    sAmount.replaceAll("0*$", "").replaceAll("\\.$", "");
-
-            title += (" - " + sAmount);
-
-            // Append a unit (if any).
-            if (unit != null) {
-                title += (" " + unit);
-            }
-        }
-
-        if (m_requirement.isOptional()) {
-            title += " (optional)";
-        }
-
-        nameText.setText(title);
+        paint();
     }
 
     /**
@@ -99,5 +71,13 @@ public class RequirementListItem extends RelativeLayout {
      */
     public void toggleDeleteButton(boolean toggle) {
         m_deleteButton.setVisibility(toggle ? VISIBLE : GONE);
+    }
+
+    /**
+     * Renders the item based on the state of the requirement model.
+     */
+    public void paint() {
+        TextView nameText = (TextView)findViewById(R.id.tutorial_requirement_item);
+        nameText.setText(m_requirement.toString());
     }
 }

@@ -9,12 +9,14 @@ package msindwan.handbook.views.tutorial.components;
 
 import android.content.Context;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import msindwan.handbook.R;
+import msindwan.handbook.data.schema.TutorialTable;
 import msindwan.handbook.models.Tutorial;
 import msindwan.handbook.views.common.EditFormView;
 
@@ -47,6 +49,10 @@ public class EditSummaryForm extends RelativeLayout implements EditFormView {
         m_name = (EditText)findViewById(R.id.tutorial_editor_name);
         m_description = (EditText)findViewById(R.id.tutorial_editor_description);
 
+        m_name.setFilters(new InputFilter[] {
+            new InputFilter.LengthFilter(TutorialTable.COL_NAME_MAX_LENGTH)
+        });
+
         m_name.setText(m_tutorial.getName());
         m_description.setText(m_tutorial.getDescription());
 
@@ -66,12 +72,12 @@ public class EditSummaryForm extends RelativeLayout implements EditFormView {
 
         if (name == null || name.isEmpty()) {
             m_name.requestFocus();
-            m_name.setError("Name is Required");
+            m_name.setError(getResources().getString(R.string.required));
             return false;
         }
         if (description == null || description.isEmpty()) {
             m_description.requestFocus();
-            m_description.setError("Description is Required");
+            m_description.setError(getResources().getString(R.string.required));
             return false;
         }
         return true;

@@ -15,8 +15,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import msindwan.handbook.data.schema.TutorialTable;
 
 /**
- * Created by Mayank Sindwani on 2017-05-03.
- *
  * TutorialTabPager:
  * Defines the fragment state pager for tutorial tabs.
  */

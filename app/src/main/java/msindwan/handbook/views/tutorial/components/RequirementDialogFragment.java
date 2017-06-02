@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -20,14 +21,17 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 import msindwan.handbook.R;
+import msindwan.handbook.data.schema.RequirementTable;
 import msindwan.handbook.models.Requirement;
 
 /**
  * Requirement Dialog:
  * Defines the dialog fragment for adding requirements.
  */
-@SuppressWarnings("unused")
 public class RequirementDialogFragment extends DialogFragment {
+
+    // Arguments.
+    public static final String ARG_STEP_INDEX = "step_index";
 
     /**
      * Interface for listening to requirement dialog events.
@@ -50,8 +54,8 @@ public class RequirementDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(
-                R.layout.tutorial_editor_requirement_dialog,
-                null
+            R.layout.tutorial_editor_requirement_dialog,
+            null
         );
 
         // Mount components.
@@ -60,8 +64,16 @@ public class RequirementDialogFragment extends DialogFragment {
         final EditText amountText = (EditText)view.findViewById(R.id.requirement_amount);
         final CheckBox chkOptional = (CheckBox)view.findViewById(R.id.requirement_optional);
 
+        nameText.setFilters(new InputFilter[] {
+            new InputFilter.LengthFilter(RequirementTable.COL_NAME_MAX_LENGTH)
+        });
+
+        unitText.setFilters(new InputFilter[] {
+            new InputFilter.LengthFilter(RequirementTable.COL_UNIT_MAX_LENGTH)
+        });
+
         // Create the dialog.
-        builder.setTitle("Add a Requirement");
+        builder.setTitle(getResources().getString(R.string.add_requirement));
         builder.setView(view)
                 .setPositiveButton(R.string.confirm, null)
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -85,12 +97,12 @@ public class RequirementDialogFragment extends DialogFragment {
                         Requirement requirement = new Requirement();
 
                         if (name.isEmpty()) {
-                            nameText.setError("Name is required");
+                            nameText.setError(getResources().getString(R.string.required));
                             return;
                         }
 
                         if (amount.isEmpty() && !unit.isEmpty()) {
-                            amountText.setError("Amount is required");
+                            amountText.setError(getResources().getString(R.string.required));
                             return;
                         }
 
@@ -106,7 +118,7 @@ public class RequirementDialogFragment extends DialogFragment {
 
                         // Fire the event listener.
                         if (m_listener != null) {
-                            int stepIndex = getArguments().getInt("stepIndex");
+                            int stepIndex = getArguments().getInt(ARG_STEP_INDEX);
                             m_listener.onSubmit(stepIndex, requirement);
                         }
                         dialog.cancel();

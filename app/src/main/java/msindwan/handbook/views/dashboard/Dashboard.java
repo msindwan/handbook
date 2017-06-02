@@ -24,7 +24,6 @@ import msindwan.handbook.views.tutorial.TutorialEditor;
  */
 public class Dashboard extends AppCompatActivity {
 
-    // View components.
     private ViewPager m_tabViewPager;
 
     @Override
@@ -36,9 +35,9 @@ public class Dashboard extends AppCompatActivity {
         m_tabViewPager = (ViewPager)findViewById(R.id.pager);
 
         // Add tabs to the tab layout.
-        tabLayout.addTab(tabLayout.newTab().setText("All"));
-        tabLayout.addTab(tabLayout.newTab().setText("Recent"));
-        tabLayout.addTab(tabLayout.newTab().setText("Frequent"));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.all)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.recent)));
+        tabLayout.addTab(tabLayout.newTab().setText(getResources().getString(R.string.frequent)));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         // Create the tab pager adapter.
@@ -53,8 +52,6 @@ public class Dashboard extends AppCompatActivity {
                 new TabLayout.TabLayoutOnPageChangeListener(tabLayout)
         );
     }
-
-    // Event Handlers.
 
     /**
      * Handler to initiate a new intent for creating tutorials
@@ -74,11 +71,9 @@ public class Dashboard extends AppCompatActivity {
         public void onTabSelected(TabLayout.Tab tab) {
             m_tabViewPager.setCurrentItem(tab.getPosition());
         }
-
         @Override
         public void onTabUnselected(TabLayout.Tab tab) {
         }
-
         @Override
         public void onTabReselected(TabLayout.Tab tab) {
         }

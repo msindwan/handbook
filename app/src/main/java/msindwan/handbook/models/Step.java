@@ -36,6 +36,7 @@ public class Step implements Parcelable {
         m_deleted = false;
     }
 
+    // Parcelable constructor.
     private Step(Parcel in) {
         m_requirements = new ArrayList<>();
         m_deleted = (Boolean)in.readValue(Boolean.class.getClassLoader());

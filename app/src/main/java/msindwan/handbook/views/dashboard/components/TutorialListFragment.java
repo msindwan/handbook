@@ -231,7 +231,6 @@ public class TutorialListFragment
 
         // NOTE: This is a little hacky. Here the text view colour is changed to
         // white in order to display correctly on the primary colour for the app.
-        // TODO: Find a more elegant way of changing the search bar text colour.
         int id = sv
                 .getContext()
                 .getResources()

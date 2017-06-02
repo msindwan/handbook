@@ -9,10 +9,13 @@ package msindwan.handbook.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Pair;
 
 import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Tutorial:
@@ -33,6 +36,7 @@ public class Tutorial implements Parcelable {
         m_numViews = 0;
     }
 
+    // Parcelable constructor.
     private Tutorial(Parcel in) {
         m_steps = new ArrayList<>();
         m_description = in.readString();
@@ -235,6 +239,40 @@ public class Tutorial implements Parcelable {
         // Swap the elements.
         m_steps.set(j, a);
         m_steps.set(i, b);
+    }
+
+    /**
+     * Collects and combines the requirements from each step.
+     *
+     * @return A collection of all of the requirements from
+     * each step.
+     */
+    public Collection<Requirement> getAllRequirements() {
+        HashMap<Pair<String, String>, Requirement> requirements;
+        requirements = new HashMap<>();
+
+        for (Step step : m_steps) {
+            for (int i = 0; i < step.getNumRequirements(); i++) {
+                Requirement r = step.getRequirement(i);
+                Pair<String, String> p = new Pair<>(r.getName(), r.getUnit());
+
+                // If the requirement already exists, update the amount (if any).
+                if (requirements.containsKey(p)) {
+                    Requirement existingRequirement = requirements.get(p);
+                    if (existingRequirement.getAmount() != null && r.getAmount() != null) {
+                        existingRequirement.setAmount(
+                                existingRequirement.getAmount() + r.getAmount()
+                        );
+                    }
+                } else {
+                    // Create a new copy of the requirement.
+                    requirements.put(p, new Requirement(r));
+                }
+
+            }
+        }
+
+        return requirements.values();
     }
 
 }

@@ -9,7 +9,6 @@ package msindwan.handbook.views.tutorial.components;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,10 +22,7 @@ import msindwan.handbook.models.Step;
  */
 public class StepForm extends RelativeLayout {
 
-    private TextView m_title;
-    private TextView m_instructions;
-    private LinearLayout m_stepLayout;
-
+    private LinearLayout m_requirementLayout;
     private Step m_step;
 
     // Constructors.
@@ -44,21 +40,12 @@ public class StepForm extends RelativeLayout {
      */
     private void init(Context context) {
         inflate(context, R.layout.tutorial_viewer_step_panel, this);
-        m_title = (TextView)findViewById(R.id.tutorial_viewer_title);
-        m_instructions = (TextView) findViewById(R.id.tutorial_viewer_instructions);
-        m_stepLayout = (LinearLayout) findViewById(R.id.tutorial_viewer_requirements);
+        TextView title = (TextView)findViewById(R.id.tutorial_viewer_title);
+        TextView instructions = (TextView) findViewById(R.id.tutorial_viewer_instructions);
+        m_requirementLayout = (LinearLayout) findViewById(R.id.tutorial_viewer_requirements);
 
-        m_title.setText(m_step.getTitle());
-        m_instructions.setText(m_step.getInstructions());
-    }
-
-    /**
-     * Getter for the view's step.
-     *
-     * @return the view's step.
-     */
-    public Step getStep() {
-        return m_step;
+        title.setText(m_step.getTitle());
+        instructions.setText(m_step.getInstructions());
     }
 
     /**
@@ -67,15 +54,9 @@ public class StepForm extends RelativeLayout {
      * @param item the item to add.
      */
     public void addRequirementListItem(RequirementListItem item) {
-        m_stepLayout.addView(item);
-    }
-
-    /**
-     * Removes a requirement list item from the layout.
-     *
-     * @param item the item to remove.
-     */
-    public void removeRequirementListItem(RequirementListItem item) {
-        m_stepLayout.removeView(item);
+        TextView requirementPlaceholder = (TextView)
+                findViewById(R.id.tutorial_viewer_requirement_placeholder);
+        requirementPlaceholder.setVisibility(View.GONE);
+        m_requirementLayout.addView(item);
     }
 }

@@ -22,9 +22,7 @@ import msindwan.handbook.models.Tutorial;
  */
 public class SummaryForm extends RelativeLayout {
 
-    private TextView m_name;
-    private TextView m_description;
-    private LinearLayout m_requirements;
+    private LinearLayout m_requirementLayout;
     private Tutorial m_tutorial;
 
     // Constructors.
@@ -42,10 +40,23 @@ public class SummaryForm extends RelativeLayout {
      */
     private void init(Context context) {
         inflate(context, R.layout.tutorial_viewer_summary_panel, this);
-        m_name = (TextView) findViewById(R.id.tutorial_viewer_name);
-        m_description = (TextView) findViewById(R.id.tutorial_viewer_description);
+        TextView name = (TextView) findViewById(R.id.tutorial_viewer_name);
+        TextView description = (TextView) findViewById(R.id.tutorial_viewer_description);
+        m_requirementLayout = (LinearLayout) findViewById(R.id.tutorial_viewer_requirements);
 
-        m_name.setText(m_tutorial.getName());
-        m_description.setText(m_tutorial.getDescription());
+        name.setText(m_tutorial.getName());
+        description.setText(m_tutorial.getDescription());
+    }
+
+    /**
+     * Adds a requirement list item to the layout.
+     *
+     * @param item the item to add.
+     */
+    public void addRequirementListItem(RequirementListItem item) {
+        TextView requirementPlaceholder = (TextView)
+                findViewById(R.id.tutorial_viewer_requirement_placeholder);
+        requirementPlaceholder.setVisibility(View.GONE);
+        m_requirementLayout.addView(item);
     }
 }

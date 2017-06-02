@@ -14,7 +14,7 @@
    viewBox="0 0 210 297"
    version="1.1"
    id="svg8"
-   inkscape:export-filename="C:\Users\Mayank Sindwani\Desktop\Mayank\Projects\alfred\design\logo.png"
+   inkscape:export-filename="C:\Projects\handbook\design\images\logo.png"
    inkscape:export-xdpi="25.4"
    inkscape:export-ydpi="25.4"
    inkscape:version="0.92.1 r15371"
@@ -28,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497475"
-     inkscape:cx="-97.467893"
-     inkscape:cy="557.81219"
+     inkscape:zoom="0.35"
+     inkscape:cx="-719.6739"
+     inkscape:cy="821.48418"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -57,29 +57,29 @@
      id="layer1">
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:62.09455109px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#37474f;fill-opacity:1;stroke:none;stroke-width:0.26458335px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
-       x="46.715839"
-       y="146.84163"
+       style="font-style:normal;font-weight:normal;font-size:62.09455109px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#363b41;fill-opacity:1;stroke:none;stroke-width:0.26458335px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="-2.8691788"
+       y="110.60908"
        id="text3682"
        transform="scale(0.93973163,1.0641336)"><tspan
          sodipodi:role="line"
          id="tspan3680"
-         x="46.715839"
-         y="146.84163"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Niconne;-inkscape-font-specification:Niconne;fill:#37474f;fill-opacity:1;stroke-width:0.26458335px;">Alfred</tspan></text>
+         x="-2.8691788"
+         y="110.60908"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Niconne;-inkscape-font-specification:Niconne;fill:#363b41;fill-opacity:1;stroke-width:0.26458335px">Handbook</tspan></text>
     <path
-       style="fill:#37474f;fill-opacity:1;fill-rule:evenodd;stroke:#d35300;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0"
-       d="m 22.306251,127.82416 c 6.067782,1.84165 12.949796,8.00344 19.014881,10.45248 0.499582,-1.19004 1.960199,-6.08708 -0.02506,-10.3538 -11.320932,5.02716 -11.414639,7.18916 -19.001495,10.27507 -1.079828,-3.5183 -1.178905,-6.98195 0.01166,-10.37375 z"
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#d35300;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0"
+       d="m 19.322145,85.525311 c 7.779735,2.21744 16.603429,9.63654 24.379706,12.5853 0.640534,-1.43286 2.513246,-7.32914 -0.03213,-12.46648 -14.514997,6.05294 -14.635143,8.6561 -24.36254,12.37169 -1.384489,-4.23621 -1.51152,-8.40661 0.01495,-12.49051 z"
        id="path4506"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc" />
     <rect
-       style="opacity:1;fill:#37474f;fill-opacity:1;stroke:#000000;stroke-width:0.12300001;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.99607843"
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.12300001;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.99607843"
        id="rect4510"
        width="6.4132695"
-       height="5.9750743"
-       x="28.827669"
-       y="129.71788"
-       ry="0.2579537" />
+       height="7.2979445"
+       x="28.884953"
+       y="87.722992"
+       ry="0.31506416" />
   </g>
 </svg>

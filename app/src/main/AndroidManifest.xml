@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/*
+ * Created by Mayank Sindwani on 2017-05-02.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
+-->
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="msindwan.handbook">
 
     <application
@@ -8,7 +20,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+
+        <!-- Main application dashboard -->
+
         <activity
             android:name="msindwan.handbook.views.dashboard.Dashboard">
             <intent-filter>
@@ -16,13 +32,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Tutorial Editor -->
+
         <activity
             android:label="Compose"
             android:name="msindwan.handbook.views.tutorial.TutorialEditor">
         </activity>
+
+        <!-- Tutorial Viewer -->
+
         <activity
             android:name="msindwan.handbook.views.tutorial.TutorialViewer">
         </activity>
+
         <provider
             android:exported="false"
             android:name="msindwan.handbook.data.DataContentProvider"

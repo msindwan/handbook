@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Handbook</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">OK</string>
@@ -21,9 +21,30 @@
     <string name="move_up">Move Up</string>
     <string name="move_down">Move Down</string>
     <string name="requirements">Requirements</string>
+    <string name="requirements_tts">Requirements:</string>
     <string name="add_requirement">Add Requirement</string>
     <string name="instructions">Instructions</string>
+    <string name="instructions_tts">Instructions:</string>
     <string name="optional">Mark as Optional</string>
     <string name="none">None</string>
     <string name="toggle">Toggle</string>
+    <string name="all">All</string>
+    <string name="recent">Recent</string>
+    <string name="frequent">Frequent</string>
+    <string name="required">Required</string>
+    <string name="summary">Summary</string>
+    <string name="saving_tutorial">Saving Tutorial</string>
+    <string name="loading">Loading</string>
+    <string name="failed_tutorial_save">"Error: Failed to Save a Tutorial"</string>
+    <string name="unknown_error">An Unknown Error Occurred</string>
+    <string name="nth_step">
+        <xliff:g id="index">%d</xliff:g>/<xliff:g id="num_steps">%d</xliff:g>
+    </string>
+    <string name="nth_step_no_title">
+        Step <xliff:g id="index">%d</xliff:g>
+    </string>
+    <string name="nth_step_title">
+        Step <xliff:g id="index">%d</xliff:g> : <xliff:g id="title">%s</xliff:g>
+    </string>
+
 </resources>

@@ -7,19 +7,25 @@
  */
 package msindwan.handbook.views.tutorial;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
 
 import msindwan.handbook.R;
 import msindwan.handbook.data.DatabaseHelper;
+import msindwan.handbook.models.Requirement;
 import msindwan.handbook.models.Step;
 import msindwan.handbook.models.Tutorial;
 import msindwan.handbook.views.tutorial.components.StepForm;
@@ -27,16 +33,24 @@ import msindwan.handbook.views.tutorial.components.RequirementListItem;
 import msindwan.handbook.views.tutorial.components.SummaryForm;
 import msindwan.handbook.views.widgets.Accordion;
 
-/**
- * Created by Mayank Sindwani on 2017-05-25.
- *
- */
 
+/**
+ * TutorialViewer:
+ * Defines a view component for viewing tutorials.
+ */
+// TODO: Add image support
+// TODO: Accept voice commands to play, pause, etc
 public class TutorialViewer extends AppCompatActivity {
 
+    private static final int TTS_STATE_STOP = 0;
+    private static final int TTS_STATE_PLAY = 1;
+    private static final String END_OF_SPEECH = "eos";
+
+    private ImageButton m_playButton;
+    private TextView m_currentStep;
     private Accordion m_accordion;
     private Tutorial m_tutorial;
-    private TextToSpeech t1;
+    private TextToSpeech m_tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +79,61 @@ public class TutorialViewer extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onPause() {
+        stopSpeech();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        m_tts.shutdown();
+    }
+
+    /**
+     * Support wrapper for tts.
+     *
+     * @param text The text to recite.
+     * @param queue The speak queue flag.
+     * @param utteranceId The utterance ID.
+     */
+    public void speak(String text, int queue, String utteranceId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            m_tts.speak(text, queue, null, utteranceId);
+        } else {
+            HashMap<String, String> params = new HashMap<>();
+            params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
+            //noinspection deprecation
+            m_tts.speak(text, queue, params);
+        }
+    }
+
+    /**
+     * Support wrapper for tts
+     * @param text The text to recite.
+     * @param queue The speak queue flag.
+     */
+    public void speak(String text, int queue) {
+        speak(text, queue, null);
+    }
+
     /**
      * Initializes the component on mount.
      */
-    @SuppressWarnings("ConstantConditions")
     private void init(Bundle savedInstanceState) {
         int activePanel = 0;
-        m_accordion = (Accordion)findViewById(R.id.tutorial_panels);
+
+        m_accordion   = (Accordion)findViewById(R.id.tutorial_panels);
+        m_playButton  = (ImageButton)findViewById(R.id.tutorial_viewer_play);
+        m_currentStep = (TextView)findViewById(R.id.tutorial_viewer_step);
+        m_tts = new TextToSpeech(getApplicationContext(), onTTSInitListener);
+        m_tts.setOnUtteranceProgressListener(onUtteranceProgressListener);
+
+
+        m_accordion.setAccordionListener(accordionListener);
+        m_playButton.setOnClickListener(onPlayButtonClick);
+        m_playButton.setTag(TTS_STATE_STOP);
 
         // Preserve the state of the view.
         if(savedInstanceState == null
@@ -82,7 +144,11 @@ public class TutorialViewer extends AppCompatActivity {
 
             m_tutorial = new Tutorial();
             if (tutorial_id == null) {
-                // TODO: Show error message
+                Toast.makeText(
+                    this,
+                    getResources().getString(R.string.unknown_error),
+                    Toast.LENGTH_SHORT
+                ).show();
                 finish();
                 return;
             }
@@ -90,6 +156,8 @@ public class TutorialViewer extends AppCompatActivity {
             // Fetch the corresponding tutorial.
             DatabaseHelper helper = DatabaseHelper.getInstance(this);
             helper.fetch(m_tutorial, Integer.parseInt(tutorial_id));
+            m_tutorial.setNumViews(m_tutorial.getNumViews() + 1);
+            helper.update(m_tutorial);
         } else {
             // Otherwise, retrieve the old state and render the view
             // accordingly.
@@ -97,6 +165,7 @@ public class TutorialViewer extends AppCompatActivity {
             activePanel = savedInstanceState.getInt("activePanel", 0);
         }
 
+        // Update the action bar.
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -110,6 +179,17 @@ public class TutorialViewer extends AppCompatActivity {
         panel.setTitle(m_tutorial.getName());
         m_accordion.addPanel(panel);
 
+        // Combine requirements and display them in the tutorial summary.
+        for (Requirement requirement : m_tutorial.getAllRequirements()) {
+            RequirementListItem item = new RequirementListItem(
+                this,
+                requirement,
+                summary
+            );
+            item.toggleDeleteButton(false);
+            summary.addRequirementListItem(item);
+        }
+
         // Add step views.
         for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
             Step step = m_tutorial.getStep(i);
@@ -121,14 +201,8 @@ public class TutorialViewer extends AppCompatActivity {
             panel.setPanelView(stepView);
             m_accordion.addPanel(panel);
             panel.setTitle(
-                String.format(Locale.getDefault(), "Step %d - %s", i + 1, step.getTitle())
+                getResources().getString(R.string.nth_step_title, i + 1, step.getTitle())
             );
-
-            if (step.getNumRequirements() > 0) {
-                TextView requirementPlaceholder = (TextView)
-                        findViewById(R.id.tutorial_viewer_requirement_placeholder);
-                requirementPlaceholder.setVisibility(View.GONE);
-            }
 
             // Add requirement list items.
             for (int j = 0; j < step.getNumRequirements(); j++) {
@@ -143,74 +217,138 @@ public class TutorialViewer extends AppCompatActivity {
         }
 
         m_accordion.setActivePanel(m_accordion.getPanel(activePanel));
-        t1 = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status != TextToSpeech.ERROR) {
-                    t1.setLanguage(Locale.getDefault());
+        m_currentStep.setText(getResources().getString(
+            R.string.nth_step,
+            activePanel,
+            m_tutorial.getNumSteps()
+        ));
+    }
+
+    /**
+     * Uses the text-to-speech interface for the specified panel.
+     *
+     * @param panelIndex the panel to recite.
+     */
+    private void panelToSpeech(int panelIndex) {
+        m_playButton.setTag(TTS_STATE_PLAY);
+        m_playButton.setImageResource(R.mipmap.ic_stop_black_24dp);
+
+        if (panelIndex == 0) {
+            // Speak the tutorial name.
+            speak(m_tutorial.getName(),TextToSpeech.QUEUE_ADD);
+
+            // Speak the collection of requirements for the tutorial.
+            Collection<Requirement> requirements = m_tutorial.getAllRequirements();
+            if (!requirements.isEmpty()) {
+                speak(getResources().getString(R.string.requirements_tts), TextToSpeech.QUEUE_ADD);
+
+                for (Requirement r : requirements) {
+                    speak(r.toString(), TextToSpeech.QUEUE_ADD);
                 }
             }
-        });
 
-        final TextView tv = (TextView)findViewById(R.id.tutorial_viewer_step);
-        tv.setText(String.format(Locale.getDefault(), "%d/%d", activePanel, m_tutorial.getNumSteps()));
+            // Speak the description.
+            speak(m_tutorial.getDescription(),TextToSpeech.QUEUE_ADD, END_OF_SPEECH);
+        } else {
+            Step step = m_tutorial.getStep(panelIndex - 1);
 
-        final ImageButton button = (ImageButton)findViewById(R.id.tutorial_viewer_play);
-        button.setTag(0);
+            // Speak the step title.
+            speak(
+                getResources()
+                    .getString(
+                        R.string.nth_step_title,
+                        panelIndex,
+                        step.getTitle()
+                    ),
+                TextToSpeech.QUEUE_ADD
+            );
 
-        m_accordion.setAccordionListener(new Accordion.AccordionListener() {
-            @Override
-            public boolean onHeaderClick(Accordion.Panel panel) {
-                int index = m_accordion.getPanelIndex(panel);
-                tv.setText(String.format(Locale.getDefault(), "%d/%d", index, m_tutorial.getNumSteps()));
-                t1.stop();
-                button.setTag(1);
-                button.setImageResource(R.mipmap.ic_play_arrow_black_24dp);
-                return true;
+            // Speak the step requirements.
+            if (step.getNumRequirements() > 0) {
+                speak(getResources().getString(R.string.requirements_tts), TextToSpeech.QUEUE_ADD);
+
+                for (int i = 0; i < step.getNumRequirements(); i++) {
+                    Requirement r = step.getRequirement(i);
+                    speak(r.toString(), TextToSpeech.QUEUE_ADD);
+                }
             }
-        });
 
+            speak(getResources().getString(R.string.instructions_tts), TextToSpeech.QUEUE_ADD);
+            speak(step.getInstructions(), TextToSpeech.QUEUE_ADD, END_OF_SPEECH);
+        }
+    }
 
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int state = (int)v.getTag();
-                if (state == 0) {
-                    t1.stop();
-                    v.setTag(1);
-                    button.setImageResource(R.mipmap.ic_play_arrow_black_24dp);
-                } else {
-                    int panelIndex = m_accordion.getActivePanel();
-                    if (panelIndex == 0) {
-                        t1.speak(m_tutorial.getDescription(),TextToSpeech.QUEUE_ADD, null);
-                    } else {
-                        Step step = m_tutorial.getStep(panelIndex - 1);
-                        t1.speak(String.format(Locale.getDefault(), "Step %d.", panelIndex), TextToSpeech.QUEUE_ADD, null);
-                        t1.speak(step.getTitle(),TextToSpeech.QUEUE_ADD, null);
-                        t1.speak(step.getInstructions(), TextToSpeech.QUEUE_ADD, null);
+    /**
+     * Stops the text-to-speech instance.
+     */
+    private void stopSpeech() {
+        m_tts.stop();
+        m_playButton.setTag(TTS_STATE_STOP);
+        m_playButton.setImageResource(R.mipmap.ic_play_arrow_black_24dp);
+    }
+
+    /**
+     * Listener for tts initialization.
+     */
+    private TextToSpeech.OnInitListener onTTSInitListener = new TextToSpeech.OnInitListener() {
+        @Override
+        public void onInit(int status) {
+            if(status != TextToSpeech.ERROR) {
+                m_tts.setLanguage(Locale.getDefault());
+            }
+        }
+    };
+
+    /**
+     * Listener for accordion actions.
+     */
+    private Accordion.AccordionListener accordionListener = new Accordion.AccordionListener() {
+        @Override
+        public boolean onHeaderClick(Accordion.Panel panel) {
+            m_currentStep.setText(getResources().getString(
+                R.string.nth_step,
+                m_accordion.getPanelIndex(panel),
+                m_tutorial.getNumSteps()
+            ));
+            stopSpeech();
+            return true;
+        }
+    };
+
+    /**
+     * Listener for the play button.
+     */
+    private View.OnClickListener onPlayButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if ((int)v.getTag() == TTS_STATE_PLAY) {
+                stopSpeech();
+            } else {
+                panelToSpeech(m_accordion.getActivePanel());
+            }
+        }
+    };
+
+    /**
+     * Listener for utterance progress.
+     */
+    private UtteranceProgressListener onUtteranceProgressListener
+            = new UtteranceProgressListener() {
+        @Override
+        public void onStart(String s) {
+        }
+        @Override
+        public void onDone(final String s) {
+            if (s.equals(END_OF_SPEECH)) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        stopSpeech();
                     }
-                    v.setTag(0);
-                    button.setImageResource(R.mipmap.ic_stop_black_24dp);
-                }
+                });
             }
-        });
-
-
-        // TODO: Update num views for tutorial
-        // TODO: Combine requirements for summary
-        // TODO: Speak requirements (if any)
-        // TODO: Accept voice commands to play, pause, etc
-        // TODO: Add image support
-        // TODO: Enforce field length constraints
-    }
-
-    @Override
-    protected void onPause() {
-        final ImageButton button = (ImageButton)findViewById(R.id.tutorial_viewer_play);
-        button.setTag(0);
-        t1.stop();
-        button.setTag(1);
-        button.setImageResource(R.mipmap.ic_play_arrow_black_24dp);
-        super.onPause();
-    }
+        }
+        @Override
+        public void onError(String s) {
+        }
+    };
 }

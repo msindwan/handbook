@@ -9,6 +9,7 @@ package msindwan.handbook.views.tutorial.components;
 
 import android.content.Context;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import msindwan.handbook.R;
+import msindwan.handbook.data.schema.StepTable;
 import msindwan.handbook.models.Step;
 import msindwan.handbook.views.common.EditFormView;
 import msindwan.handbook.views.widgets.Accordion;
@@ -63,6 +65,9 @@ public class EditStepForm extends RelativeLayout implements EditFormView {
 
         m_instructions.setText(m_step.getInstructions());
         m_title.setText(m_step.getTitle());
+        m_title.setFilters(new InputFilter[] {
+            new InputFilter.LengthFilter(StepTable.COL_TITLE_MAX_LENGTH)
+        });
 
         m_instructions.addTextChangedListener(onInstructionsChanged);
         m_title.addTextChangedListener(onTitleChanged);
@@ -158,6 +163,16 @@ public class EditStepForm extends RelativeLayout implements EditFormView {
     }
 
     /**
+     * Returns the requirement list item at the specified index.
+     *
+     * @param index The index of the desired list item.
+     * @return The list item.
+     */
+    public RequirementListItem getRequirementListItem(int index) {
+        return (RequirementListItem)m_stepLayout.getChildAt(index);
+    }
+
+    /**
      * Validates the step and sets text field errors.
      *
      * @return True if valid; false otherwise.
@@ -169,12 +184,12 @@ public class EditStepForm extends RelativeLayout implements EditFormView {
 
         if (title == null || title.isEmpty()) {
             m_title.requestFocus();
-            m_title.setError("Title is Required");
+            m_title.setError(getResources().getString(R.string.required));
             return false;
         }
         if (instructions == null || instructions.isEmpty()) {
             m_instructions.requestFocus();
-            m_instructions.setError("Instructions are Required");
+            m_instructions.setError(getResources().getString(R.string.required));
             return false;
         }
         return true;

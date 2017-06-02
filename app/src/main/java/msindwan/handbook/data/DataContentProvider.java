@@ -12,7 +12,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
@@ -22,6 +21,8 @@ import java.util.Locale;
 import msindwan.handbook.data.schema.TutorialTable;
 
 /**
+ * Created by Mayank Sindwani on 2017-05-11.
+ *
  * DataContentProvider:
  * The data access layer for the application.
  */
@@ -125,12 +126,11 @@ public class DataContentProvider extends ContentProvider {
 
         Context context = getContext();
         if (context == null) {
-            // TODO Throw a more appropriate exception with a description.
-            throw new SQLException("");
+            throw new NullPointerException("Cannot get content resolver without context.");
         }
 
         // Send an update notification.
-        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        cursor.setNotificationUri(context.getContentResolver(), uri);
         return cursor;
     }
 }

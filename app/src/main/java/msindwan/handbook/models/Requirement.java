@@ -33,6 +33,18 @@ public class Requirement implements Parcelable {
         m_deleted = false;
     }
 
+    // Copy constructor.
+    Requirement(Requirement rToCopy) {
+        m_deleted = rToCopy.isDeleted();
+        m_optional = rToCopy.isOptional();
+        m_amount = rToCopy.getAmount();
+        m_name = rToCopy.getName();
+        m_unit = rToCopy.getUnit();
+        m_stepId = rToCopy.getStepId();
+        m_id = rToCopy.getId();
+    }
+
+    // Parcelable constructor.
     private Requirement(Parcel in) {
         m_name = in.readString();
         m_unit = in.readString();
@@ -225,4 +237,44 @@ public class Requirement implements Parcelable {
     public Boolean isDeleted() {
         return m_deleted;
     }
+
+    /**
+     * Returns a string representation of the requirement.
+     *
+     * @return  a string representation of the requirement.
+     */
+    @Override
+    public String toString() {
+        // Get the requirement fields.
+        String requirementAsString = m_name;
+        Double amount = m_amount;
+        String unit = m_unit;
+
+        if (requirementAsString == null) {
+            return null;
+        }
+
+        if (amount != null && amount != 0) {
+            String sAmount = Double.toString(amount);
+
+            // Remove trailing zeros.
+            sAmount = !sAmount.contains(".") ?
+                    sAmount :
+                    sAmount.replaceAll("0*$", "").replaceAll("\\.$", "");
+
+            requirementAsString += (" : " + sAmount);
+
+            // Append a unit (if any).
+            if (unit != null) {
+                requirementAsString += (" " + unit);
+            }
+        }
+
+        if (isOptional()) {
+            requirementAsString += " (optional)";
+        }
+
+        return requirementAsString;
+    }
+
 }

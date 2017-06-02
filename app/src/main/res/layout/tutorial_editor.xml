@@ -10,6 +10,11 @@
     android:orientation="vertical"
     tools:context=".views.tutorial.TutorialEditor">
 
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <ScrollView
         android:id="@+id/accordion_scroll_view"
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,7 +24,7 @@
         <msindwan.handbook.views.widgets.Accordion
             android:id="@+id/tutorial_panels"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
         </msindwan.handbook.views.widgets.Accordion>
 

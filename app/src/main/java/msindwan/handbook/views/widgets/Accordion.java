@@ -27,8 +27,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
 import msindwan.handbook.R;
 
 /**
@@ -51,7 +49,6 @@ public class Accordion extends LinearLayout {
      */
     public static class Panel extends RelativeLayout {
 
-        // TODO: For completeness, make colour properties configurable.
         // View components.
         private LinearLayout m_panelLayout;
         private LinearLayout m_panelHeader;
@@ -257,7 +254,6 @@ public class Accordion extends LinearLayout {
 
     // View components.
     private AccordionListener m_listener;
-    private ArrayList<Panel> m_panels;
     private int m_activePanel;
 
     // Constructors.
@@ -277,7 +273,6 @@ public class Accordion extends LinearLayout {
      * @param context The initialization context.
      */
     private void init(@SuppressWarnings("UnusedParameters") Context context) {
-        m_panels = new ArrayList<>();
         setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -286,12 +281,12 @@ public class Accordion extends LinearLayout {
     }
 
     /**
-     * Getter for the size of the panels array.
+     * Getter for the size of the panels container.
      *
      * @return The number of panels present in the accordion.
      */
     public int getNumPanels() {
-        return m_panels.size();
+        return getChildCount();
     }
 
     /**
@@ -313,7 +308,7 @@ public class Accordion extends LinearLayout {
             }
         });
 
-        if (!m_panels.isEmpty()) {
+        if (getChildCount() != 0) {
             // Deactivate and hide the panel.
             panel.deactivate();
             panel.setPadding(10, 0, 10, 10);
@@ -325,7 +320,6 @@ public class Accordion extends LinearLayout {
         }
 
         // Add the panel.
-        m_panels.add(panel);
         addView(panel, new RelativeLayout.LayoutParams(
             LayoutParams.MATCH_PARENT,
             LayoutParams.WRAP_CONTENT
@@ -339,7 +333,7 @@ public class Accordion extends LinearLayout {
      * @return Returns the panel at the specified index.
      */
     public Panel getPanel(int index) {
-        return m_panels.get(index);
+        return (Panel)getChildAt(index);
     }
 
     /**
@@ -349,7 +343,7 @@ public class Accordion extends LinearLayout {
      * @return The index of the panel (-1 if not found).
      */
     public int getPanelIndex(Panel panel) {
-        return m_panels.indexOf(panel);
+        return indexOfChild(panel);
     }
 
     /**
@@ -358,13 +352,12 @@ public class Accordion extends LinearLayout {
      * @param panel The panel to remove.
      */
     public void removePanel(Panel panel) {
-        if (m_panels.size() <= 1)
+        if (getNumPanels() <= 1)
             return;
 
-        int panelIndex = m_panels.indexOf(panel);
+        int panelIndex = getPanelIndex(panel);
 
         // Remove the panel references.
-        m_panels.remove(panel);
         removeView(panel);
 
         // Update the active panel.
@@ -403,7 +396,7 @@ public class Accordion extends LinearLayout {
         if (activePanel == panel)
             return;
 
-        m_activePanel = m_panels.indexOf(panel);
+        m_activePanel = getPanelIndex(panel);
 
         // Play the animations together.
         AnimatorSet set = createSet(panel);
@@ -420,13 +413,17 @@ public class Accordion extends LinearLayout {
         return m_activePanel;
     }
 
+    /**
+     * Moves a panel to the specified index.
+     *
+     * @param panel The panel to move.
+     * @param index The index to move it to.
+     */
     public void movePanel(Panel panel, int index) {
         int panelIndex = getPanelIndex(panel);
         if (m_activePanel == panelIndex) {
             m_activePanel = index;
         }
-        m_panels.set(panelIndex, m_panels.get(index));
-        m_panels.set(index, panel);
         removeView(panel);
         addView(panel, index);
     }
@@ -483,6 +480,11 @@ public class Accordion extends LinearLayout {
         return showNewLayout;
     }
 
+    /**
+     * Sets the accordion listener for the instance.
+     *
+     * @param listener The listener to set.
+     */
     public void setAccordionListener(AccordionListener listener) {
         m_listener = listener;
     }
