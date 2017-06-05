@@ -18,14 +18,13 @@
     <TextView
         android:id="@+id/tutorial_viewer_title"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="10dp"
         android:paddingBottom="5dp"
         android:textColor="@color/colorAccent"
         android:textAllCaps="true"
-        android:layout_weight="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
     <TextView
