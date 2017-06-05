@@ -25,6 +25,7 @@ import msindwan.handbook.models.Requirement;
 import msindwan.handbook.models.Step;
 import msindwan.handbook.models.Tutorial;
 import msindwan.handbook.R;
+import msindwan.handbook.util.StringHelper;
 import msindwan.handbook.views.common.EditFormView;
 import msindwan.handbook.views.tutorial.components.RequirementDialogFragment;
 import msindwan.handbook.views.tutorial.components.RequirementListItem;
@@ -148,7 +149,7 @@ public class TutorialEditor extends AppCompatActivity {
             Bundle args = new Bundle();
             args.putString(
                 AsyncProgressDialog.ARG_MESSAGE,
-                getResources().getString(R.string.summary)
+                getResources().getString(R.string.saving_tutorial)
             );
             m_saveDialog.setArguments(args);
 
@@ -358,19 +359,36 @@ public class TutorialEditor extends AppCompatActivity {
         @Override
         public void onSubmit(int stepIndex, final Requirement requirement) {
             // Add the new requirement.
-            final EditStepForm view = (EditStepForm)m_accordion.getPanel(stepIndex + 1).getPanelView();
-            final RequirementListItem item = new RequirementListItem(TutorialEditor.this, requirement, view);
+            final EditStepForm view = (EditStepForm)
+                m_accordion.getPanel(stepIndex + 1).getPanelView();
+            final RequirementListItem item = new RequirementListItem(
+                TutorialEditor.this,
+                requirement,
+                view
+            );
             item.setRequirementOnRemoveListener(onRequirementRemoved);
 
             Step step = view.getStep();
 
             for (int i = 0; i < step.getNumRequirements(); i++) {
                 // Look for existing requirements that have the same unit and amount.
-                Requirement r = step.getRequirement(i);
-                if (r.getUnit().equals(requirement.getUnit()) && r.getName().equals(requirement.getName())) {
-                    if (r.getAmount() != null && requirement.getAmount() != null) {
-                        r.setAmount(r.getAmount() + requirement.getAmount());
-                        view.getRequirementListItem(i).paint();
+                Requirement oldRequirement = step.getRequirement(i);
+                String name = oldRequirement.getName();
+                String unit = oldRequirement.getUnit();
+
+                // The name and optional flags must be equivalent.
+                if (name.equals(requirement.getName())
+                        && oldRequirement.isOptional() == requirement.isOptional()) {
+
+                    if (StringHelper.equals(unit, requirement.getUnit())) {
+                        if (oldRequirement.getAmount() != null && requirement.getAmount() != null) {
+                            // The name and units are equal, so add the amount to the existing
+                            // requirement.
+                            oldRequirement.setAmount(
+                                oldRequirement.getAmount() + requirement.getAmount()
+                            );
+                            view.getRequirementListItem(i).paint();
+                        }
                         return;
                     }
                 }
