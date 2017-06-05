@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
 /*
  * Created by Mayank Sindwani on 2017-05-02.
@@ -9,7 +8,6 @@
  * available at http://www.apache.org/licenses/LICENSE-2.0.
  */
 -->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="msindwan.handbook">

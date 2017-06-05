@@ -1,10 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Mayank Sindwani on 2017-05-08.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
+-->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Handbook</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">OK</string>
     <string name="add_step">Add Step</string>
     <string name="save">Save</string>
-    <string name="remove_step">Remove Step</string>
     <string name="tutorial_name">Tutorial Name</string>
     <string name="description">Description</string>
     <string name="more">More</string>
@@ -46,5 +55,5 @@
     <string name="nth_step_title">
         Step <xliff:g id="index">%d</xliff:g> : <xliff:g id="title">%s</xliff:g>
     </string>
-
+    <string name="play">Play</string>
 </resources>

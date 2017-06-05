@@ -83,8 +83,8 @@ public class TutorialListFragment
         /**
          * Get a View that displays the data at the specified position in the data set.
          *
-         * @param position The position of the item within the adapter's data set of the item whose view
-         *        we want.
+         * @param position The position of the item within the adapter's data set of the item whose
+         *                 view we want.
          * @param convertView The old view to reuse, if possible.
          * @param parent The parent that this view will eventually be attached to
          * @return A View corresponding to the data at the specified position.

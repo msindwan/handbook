@@ -161,7 +161,8 @@ public class TutorialEditor extends AppCompatActivity {
             // accordingly.
             m_tutorial = savedInstanceState.getParcelable("tutorial");
             activePanel = savedInstanceState.getInt("activePanel", 0);
-            m_saveDialog = (AsyncProgressDialog)getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            m_saveDialog = (AsyncProgressDialog)
+                    getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         }
 
         m_saveDialog.setTask(onSave);
@@ -218,7 +219,8 @@ public class TutorialEditor extends AppCompatActivity {
             view.toggleMoveDownButton(true);
 
             // Disable the move down button for the last panel.
-            view = (EditStepForm)m_accordion.getPanel(m_accordion.getNumPanels() - 1).getPanelView();
+            view = (EditStepForm)
+                    m_accordion.getPanel(m_accordion.getNumPanels() - 1).getPanelView();
             view.toggleMoveUpButton(true);
             view.toggleMoveDownButton(false);
 

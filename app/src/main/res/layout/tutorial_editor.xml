@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:id="@+id/tutorial_editor"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+/*
+ * Created by Mayank Sindwani on 2017-05-21.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:focusable="true"
     android:focusableInTouchMode="true"
@@ -10,14 +17,14 @@
     android:orientation="vertical"
     tools:context=".views.tutorial.TutorialEditor">
 
+    <!-- Async Dialog Fragment Container -->
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <ScrollView
-        android:id="@+id/accordion_scroll_view"
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <!-- Accordion -->
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
