@@ -27,8 +27,16 @@ public class StringHelper {
         if (a == null || b == null) {
             return a == null && b == null;
         }
-
         return a.equals(b);
     }
 
+    /**
+     * Checks if a string is null or empty.
+     *
+     * @param a The string to check.
+     * @return True if null or empty; false otherwise.
+     */
+    public static boolean isEmpty(String a) {
+        return a == null || a.isEmpty();
+    }
 }

@@ -173,19 +173,17 @@ public class TutorialViewer extends AppCompatActivity {
         }
 
         // Add the summary panel.
-        Accordion.Panel panel = new Accordion.Panel(this);
+        Accordion.Panel panel = m_accordion.addPanel();
         SummaryForm summary = new SummaryForm(this, m_tutorial, panel);
-        panel.setPanelView(summary);
+        //panel.setPanelView(summary);
         panel.setTitle(m_tutorial.getName());
-        m_accordion.addPanel(panel);
+        //m_accordion.addPanel(panel);
 
         // Combine requirements and display them in the tutorial summary.
         for (Requirement requirement : m_tutorial.getAllRequirements()) {
-            RequirementListItem item = new RequirementListItem(
-                this,
-                requirement,
-                summary
-            );
+            RequirementListItem item = new RequirementListItem(this);
+            item.setRequirement(requirement);
+            item.setTag(summary);
             item.toggleDeleteButton(false);
             summary.addRequirementListItem(item);
         }
@@ -195,28 +193,22 @@ public class TutorialViewer extends AppCompatActivity {
             Step step = m_tutorial.getStep(i);
 
             // Create the views.
-            panel = new Accordion.Panel(this);
+            panel = m_accordion.addPanel();
             final StepForm stepView = new StepForm(this, step, panel);
-
-            panel.setPanelView(stepView);
-            m_accordion.addPanel(panel);
             panel.setTitle(
                 getResources().getString(R.string.nth_step_title, i + 1, step.getTitle())
             );
 
             // Add requirement list items.
             for (int j = 0; j < step.getNumRequirements(); j++) {
-                RequirementListItem item = new RequirementListItem(
-                        this,
-                        step.getRequirement(j),
-                        stepView
-                );
+                RequirementListItem item = new RequirementListItem(this);
+                item.setRequirement(step.getRequirement(j));
+                item.setTag(stepView);
                 item.toggleDeleteButton(false);
                 stepView.addRequirementListItem(item);
             }
         }
 
-        m_accordion.setActivePanel(m_accordion.getPanel(activePanel));
         m_currentStep.setText(getResources().getString(
             R.string.nth_step,
             activePanel,
@@ -312,6 +304,12 @@ public class TutorialViewer extends AppCompatActivity {
             ));
             stopSpeech();
             return true;
+        }
+        @Override
+        public void onPanelExpanded(int position) {}
+        @Override
+        public View getItem(int position) {
+            return null;
         }
     };
 

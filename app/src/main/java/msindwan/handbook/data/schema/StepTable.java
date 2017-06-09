@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.Locale;
 
 /**
- * TutorialTable:
+ * StepTable:
  * Defines the schema for steps.
  */
 @SuppressWarnings("WeakerAccess")
@@ -28,7 +28,7 @@ public class StepTable {
     public static final int COL_TITLE_MAX_LENGTH = 100;
 
     /**
-     * Creates the tutorials table
+     * Creates the steps table
      *
      * @param db The database instance to execute against.
      */

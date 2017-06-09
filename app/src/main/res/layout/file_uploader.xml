@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Mayank Sindwani on 2017-06-07.
+ *
+ * This file is part of Handbook which is licensed under the
+ * Apache License, Version 2.0. Full license details are
+ * available at http://www.apache.org/licenses/LICENSE-2.0.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Item container -->
+    <LinearLayout
+        android:id="@+id/file_uploader_items"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Upload area -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:descendantFocusability="blocksDescendants"
+        android:id="@+id/file_uploader_zone"
+        android:clickable="true"
+        android:background="@drawable/dotted_border"
+        android:layout_marginTop="10dp"
+        android:padding="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:contentDescription="@string/upload"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            android:duplicateParentState="true"
+            android:layout_marginBottom="5dp"
+            android:tint="@android:color/white"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/circle"
+            android:gravity="center_vertical|center_horizontal"
+            android:src="@mipmap/ic_add_a_photo_black_24dp"
+            android:textColor="#fff" />
+
+        <TextView
+            android:duplicateParentState="true"
+            android:layout_weight="1"
+            android:text="@string/add_image"
+            android:textAllCaps="true"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

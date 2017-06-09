@@ -46,6 +46,8 @@
     <string name="loading">Loading</string>
     <string name="failed_tutorial_save">"Error: Failed to Save a Tutorial"</string>
     <string name="unknown_error">An Unknown Error Occurred</string>
+    <string name="add_image">Add Image</string>
+    <string name="upload">Upload</string>
     <string name="nth_step">
         <xliff:g id="index">%d</xliff:g>/<xliff:g id="num_steps">%d</xliff:g>
     </string>

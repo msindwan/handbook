@@ -23,6 +23,7 @@ import java.util.ArrayList;
 public class Step implements Parcelable {
 
     private ArrayList<Requirement> m_requirements;
+    private ArrayList<Image> m_images;
     private Boolean m_deleted;
     private String m_instructions;
     private Long m_tutorialId;
@@ -33,12 +34,14 @@ public class Step implements Parcelable {
     // Constructors.
     public Step() {
         m_requirements = new ArrayList<>();
+        m_images = new ArrayList<>();
         m_deleted = false;
     }
 
     // Parcelable constructor.
     private Step(Parcel in) {
         m_requirements = new ArrayList<>();
+        m_images = new ArrayList<>();
         m_deleted = (Boolean)in.readValue(Boolean.class.getClassLoader());
         m_title = in.readString();
         m_instructions = in.readString();
@@ -46,6 +49,7 @@ public class Step implements Parcelable {
         m_index = (long)in.readValue(long.class.getClassLoader());
         m_id = (long)in.readValue(long.class.getClassLoader());
         in.readTypedList(m_requirements, Requirement.CREATOR);
+        in.readTypedList(m_images, Image.CREATOR);
     }
 
     /**
@@ -72,6 +76,7 @@ public class Step implements Parcelable {
         out.writeValue(m_index);
         out.writeValue(m_id);
         out.writeTypedList(m_requirements);
+        out.writeTypedList(m_images);
     }
 
     /**
@@ -212,23 +217,13 @@ public class Step implements Parcelable {
     }
 
     /**
-     * Adds a step to the tutorial.
+     * Adds a requirement to the step.
      *
-     * @param requirement The step to add.
+     * @param requirement The requirement to add.
      * @return true if successful; false otherwise.
      */
     public boolean addRequirement(Requirement requirement) {
         return m_requirements.add(requirement);
-    }
-
-    /**
-     * Removes the specified requirement from the step.
-     *
-     * @param index The position of the requirement to remove.
-     * @return the requirement that was removed.
-     */
-    public Requirement removeRequirement(int index) {
-        return m_requirements.remove(index);
     }
 
     /**
@@ -239,6 +234,45 @@ public class Step implements Parcelable {
      */
     public boolean removeRequirement(Requirement requirement) {
         return m_requirements.remove(requirement);
+    }
+
+    /**
+     * Returns the number of images in the step.
+     *
+     * @return the number of images.
+     */
+    public int getNumImages() {
+        return m_images.size();
+    }
+
+    /**
+     * Returns the specified step image.
+     *
+     * @param index The position of the desired image.
+     * @return the image at the specified position.
+     */
+    public Image getImage(int index) {
+        return m_images.get(index);
+    }
+
+    /**
+     * Adds an image to the step.
+     *
+     * @param image The image to add.
+     * @return true if successful; false otherwise.
+     */
+    public boolean addImage(Image image) {
+        return m_images.add(image);
+    }
+
+    /**
+     * Removes the specified image from the step.
+     *
+     * @param image The image to remove.
+     * @return true if the image existed in the array; false otherwise.
+     */
+    public boolean removeImage(Image image) {
+        return m_images.remove(image);
     }
 
     /**

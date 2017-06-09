@@ -9,32 +9,26 @@ package msindwan.handbook.views.tutorial.components;
 
 import android.content.Context;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import msindwan.handbook.R;
-import msindwan.handbook.data.schema.TutorialTable;
 import msindwan.handbook.models.Tutorial;
-import msindwan.handbook.views.common.EditFormView;
 
 /**
  * SummaryView:
  * Defines a view representing a tutorial's summary.
  */
-public class EditSummaryForm extends RelativeLayout implements EditFormView {
+public class EditSummaryForm extends RelativeLayout {
 
     private EditText m_name;
     private EditText m_description;
     private Tutorial m_tutorial;
 
     // Constructors.
-    public EditSummaryForm(Context context, Tutorial tutorial, View tag) {
+    public EditSummaryForm(Context context) {
         super(context);
-        m_tutorial = tutorial;
-        setTag(tag);
         init(context);
     }
 
@@ -45,27 +39,38 @@ public class EditSummaryForm extends RelativeLayout implements EditFormView {
      */
     private void init(Context context) {
         inflate(context, R.layout.tutorial_editor_summary_panel, this);
-
         m_name = (EditText)findViewById(R.id.tutorial_editor_name);
         m_description = (EditText)findViewById(R.id.tutorial_editor_description);
-
-        m_name.setFilters(new InputFilter[] {
-            new InputFilter.LengthFilter(TutorialTable.COL_NAME_MAX_LENGTH)
-        });
-
-        m_name.setText(m_tutorial.getName());
-        m_description.setText(m_tutorial.getDescription());
 
         m_name.addTextChangedListener(onNameChanged);
         m_description.addTextChangedListener(onDescriptionChanged);
     }
 
     /**
-     * Validates the tutorial and sets text field errors.
+     * Setter for the tutorial.
+     *
+     * @param tutorial the tutorial to set.
+     */
+    public void setTutorial(Tutorial tutorial) {
+        m_tutorial = tutorial;
+        m_name.setText(m_tutorial.getName());
+        m_description.setText(m_tutorial.getDescription());
+    }
+
+    /**
+     * Getter for the tutorial.
+     *
+     * @return the tutorial.
+     */
+    public Tutorial getTutorial() {
+        return m_tutorial;
+    }
+
+    /**
+     * Validates the summary view.
      *
      * @return True if valid; false otherwise.
      */
-    @Override
     public boolean validate() {
         String name = m_tutorial.getName();
         String description = m_tutorial.getDescription();
@@ -94,7 +99,9 @@ public class EditSummaryForm extends RelativeLayout implements EditFormView {
         public void afterTextChanged(Editable s) {}
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            m_tutorial.setName(m_name.getText().toString());
+            if (m_tutorial != null) {
+                m_tutorial.setName(m_name.getText().toString());
+            }
         }
     };
 
@@ -108,7 +115,9 @@ public class EditSummaryForm extends RelativeLayout implements EditFormView {
         public void afterTextChanged(Editable s) {}
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            m_tutorial.setDescription(m_description.getText().toString());
+            if (m_tutorial != null) {
+                m_tutorial.setDescription(m_description.getText().toString());
+            }
         }
     };
 

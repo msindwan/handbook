@@ -8,7 +8,6 @@
 package msindwan.handbook.views.tutorial.components;
 
 import android.content.Context;
-import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,10 +25,8 @@ public class RequirementListItem extends RelativeLayout {
     private Button m_deleteButton;
 
     // Constructors.
-    public RequirementListItem(Context context, Requirement requirement, View tag) {
+    public RequirementListItem(Context context) {
         super(context);
-        m_requirement = requirement;
-        setTag(tag);
         init(context);
     }
 
@@ -41,7 +38,6 @@ public class RequirementListItem extends RelativeLayout {
     private void init(Context context) {
         inflate(context, R.layout.tutorial_requirement_list_item, this);
         m_deleteButton = (Button)findViewById(R.id.tutorial_requirement_delete);
-        paint();
     }
 
     /**
@@ -51,6 +47,16 @@ public class RequirementListItem extends RelativeLayout {
      */
     public Requirement getRequirement() {
         return m_requirement;
+    }
+
+    /**
+     * Setter for the requirement.
+     * @param requirement The requirement to set.
+     */
+    public void setRequirement(Requirement requirement) {
+        m_requirement = requirement;
+        TextView nameText = (TextView)findViewById(R.id.tutorial_requirement_item);
+        nameText.setText(m_requirement.toString());
     }
 
     /**
@@ -71,13 +77,5 @@ public class RequirementListItem extends RelativeLayout {
      */
     public void toggleDeleteButton(boolean toggle) {
         m_deleteButton.setVisibility(toggle ? VISIBLE : GONE);
-    }
-
-    /**
-     * Renders the item based on the state of the requirement model.
-     */
-    public void paint() {
-        TextView nameText = (TextView)findViewById(R.id.tutorial_requirement_item);
-        nameText.setText(m_requirement.toString());
     }
 }

@@ -21,7 +21,6 @@ import java.util.HashMap;
  * Tutorial:
  * Represents the data in a tutorial.
  */
-@SuppressWarnings("unused")
 public class Tutorial implements Parcelable {
 
     private ArrayList<Step> m_steps;

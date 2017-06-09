@@ -12,10 +12,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 
+import msindwan.handbook.data.schema.ImageTable;
 import msindwan.handbook.data.schema.RequirementTable;
 import msindwan.handbook.data.schema.StepTable;
 import msindwan.handbook.data.schema.TutorialTable;
+import msindwan.handbook.models.Image;
 import msindwan.handbook.models.Requirement;
 import msindwan.handbook.models.Step;
 import msindwan.handbook.models.Tutorial;
@@ -54,6 +57,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         RequirementTable.COL_OPTIONAL,
         RequirementTable.COL_STEP_ID
     };
+    private static final String[] IMAGES_PROJECTION = new String[] {
+        ImageTable.COL_ID,
+        ImageTable.COL_URI
+    };
 
     /**
      * Gets the singleton instance.
@@ -78,15 +85,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super.onOpen(db);
         db.execSQL("PRAGMA foreign_keys=ON");
     }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         TutorialTable.createTable(db);
         StepTable.createTable(db);
         RequirementTable.createTable(db);
+        ImageTable.createTable(db);
     }
+
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 
     /**
      * Fetches the tutorial with the given id.
@@ -158,6 +167,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     }
                     cRequirements.close();
                 }
+
+                // Fetch all of the step images.
+                Cursor cImages = db.query(
+                        ImageTable.TABLE_NAME,
+                        IMAGES_PROJECTION,
+                        String.format("%s = ?", ImageTable.COL_STEP_ID),
+                        new String[]{Long.toString(step.getId())},
+                        null,
+                        null,
+                        null
+                );
+
+                if (cImages != null) {
+                    while (cImages.moveToNext()) {
+                        // Create and read each requirement.
+                        Image image = new Image();
+                        read(image, cImages);
+                        step.addImage(image);
+                    }
+                    cImages.close();
+                }
             }
             cSteps.close();
         }
@@ -211,11 +241,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(StepTable.COL_INDEX, step.getIndex());
 
         long id  = db.insert(StepTable.TABLE_NAME, null, values);
+        int i;
 
-        for (int i = 0; i < step.getNumRequirements(); i++) {
+        for (i = 0; i < step.getNumRequirements(); i++) {
             Requirement requirement = step.getRequirement(i);
             requirement.setStepId(id);
             insert(requirement);
+        }
+
+        for (i = 0; i < step.getNumImages(); i++) {
+            Image image = step.getImage(i);
+            image.setStepId(id);
+            insert(image);
         }
 
         return id;
@@ -241,6 +278,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(RequirementTable.COL_OPTIONAL, requirement.isOptional() ? 1 : 0);
 
         return db.insert(RequirementTable.TABLE_NAME, null, values);
+    }
+
+    /**
+     * Inserts the image into the database
+     *
+     * @param image The image to insert.
+     * @return the id of the newly created image.
+     */
+    public long insert(Image image) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        if (image.getId() != null) {
+            throw new IllegalArgumentException("Image ID already exists.");
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(ImageTable.COL_URI, image.getImageURI().toString());
+        values.put(ImageTable.COL_STEP_ID, image.getStepId());
+
+        return db.insert(ImageTable.TABLE_NAME, null, values);
     }
 
     /**
@@ -316,7 +373,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 whereArgs
         );
 
-        for (int i = 0; i < step.getNumRequirements(); i++) {
+        int i;
+        for (i = 0; i < step.getNumRequirements(); i++) {
             Requirement requirement = step.getRequirement(i);
             requirement.setStepId(step.getId());
 
@@ -329,6 +387,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } else {
                 // Update the existing requirement.
                 update(requirement);
+            }
+        }
+
+        for (i = 0; i < step.getNumImages(); i++) {
+            Image image = step.getImage(i);
+            image.setStepId(step.getId());
+
+            if (image.getId() == null) {
+                // The image does not exist, so insert it.
+                insert(image);
+            } else if (image.isDeleted()) {
+                // The image is marked for deletion.
+                delete(image);
+            } else {
+                // Update the existing image.
+                update(image);
             }
         }
     }
@@ -359,6 +433,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             new String[] {
                 Long.toString(requirement.getId())
             }
+        );
+    }
+
+    /**
+     * Updates the existing image.
+     *
+     * @param image The image to update.
+     */
+    public void update(Image image) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        if (image.getId() == null) {
+            throw new IllegalArgumentException("Image ID not set.");
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(ImageTable.COL_URI, image.getImageURI().toString());
+        values.put(ImageTable.COL_STEP_ID, image.getStepId());
+
+        db.update(
+                ImageTable.TABLE_NAME,
+                values,
+                String.format("%s = ?", RequirementTable.COL_ID),
+                new String[] {
+                        Long.toString(image.getId())
+                }
         );
     }
 
@@ -426,6 +526,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Deletes the existing image.
+     *
+     * @param image The image to delete.
+     */
+    public void delete(Image image) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        if (image.getId() == null) {
+            throw new IllegalArgumentException("Image ID not set.");
+        }
+
+        db.delete(
+                ImageTable.TABLE_NAME,
+                String.format("%s = ?", RequirementTable.COL_ID),
+                new String[] {
+                        Long.toString(image.getId())
+                }
+        );
+    }
+
+    /**
      * Reads the provided cursor into the requirement.
      *
      * @param tutorial The tutorial to read into.
@@ -473,5 +594,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.getString(cursor.getColumnIndex(RequirementTable.COL_UNIT)));
         requirement.setOptional(
                 cursor.getInt(cursor.getColumnIndex(RequirementTable.COL_OPTIONAL)) == 1);
+    }
+
+    /**
+     * Reads the provided cursor into the image.
+     *
+     * @param image The image to read into.
+     * @param cursor The cursor to read from.
+     */
+    public void read(Image image, Cursor cursor) {
+        image.setId(
+                cursor.getLong(cursor.getColumnIndex(ImageTable.COL_ID)));
+        image.setImageURI(
+                Uri.parse(cursor.getString(cursor.getColumnIndex(ImageTable.COL_URI))));
     }
 }

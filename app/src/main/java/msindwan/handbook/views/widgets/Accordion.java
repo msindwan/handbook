@@ -15,6 +15,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -40,20 +42,40 @@ public class Accordion extends LinearLayout {
      * Defines the interface for listening to accordion actions.
      */
     public interface AccordionListener {
+        /**
+         * Listener for header click events.
+         *
+         * @param panel The panel that was clicked.
+         * @return True if the default behaviour should persist; false otherwise.
+         */
         boolean onHeaderClick(Panel panel);
+
+        /**
+         * Returns the view item for a panel given the accordion position.
+         *
+         * @param position The accordion position.
+         * @return The view to render.
+         */
+        View getItem(int position);
+
+        /**
+         * Callback for when a panel is expanded.
+         *
+         * @param position The position of the panel that was expanded.
+         */
+        void onPanelExpanded(int position);
     }
 
     /**
      * Panel:
      * Defines a panel view for the accordion.
      */
-    public static class Panel extends RelativeLayout {
+    public class Panel extends RelativeLayout {
 
         // View components.
         private LinearLayout m_panelLayout;
         private LinearLayout m_panelHeader;
         private TextView m_title;
-        private View m_panelView;
         private boolean m_active;
         private int m_height;
 
@@ -74,34 +96,33 @@ public class Accordion extends LinearLayout {
             m_panelLayout = (LinearLayout)findViewById(R.id.accordion_panel);
             m_panelHeader = (LinearLayout)findViewById(R.id.accordion_panel_header);
             m_title = (TextView)findViewById(R.id.accordion_panel_header_title);
-            m_panelView = null;
+            m_height = -1;
 
             // Listen for global layout changes. Once the panel is rendered,
             // determine the measured height and hide the layout if it isn't
             // active.
-            ViewTreeObserver viewTreeObserver = m_panelLayout.getViewTreeObserver();
+            final LinearLayout panelLayout = getLayout();
+            ViewTreeObserver viewTreeObserver = panelLayout.getViewTreeObserver();
             viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    m_height = m_panelLayout.getMeasuredHeight();
+                    m_height = panelLayout.getMeasuredHeight();
+
                     if (!m_active) {
-                        m_panelLayout.setLayoutParams(
-                            new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                0
-                            )
-                        );
+                        panelLayout.removeAllViews();
+                    } else {
+                        m_listener.onPanelExpanded(getPanelIndex(Panel.this));
                     }
+
                     // Remove the listener.
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        m_panelLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        panelLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     } else {
                         //noinspection deprecation
-                        m_panelLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                        panelLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                     }
                 }
             });
-
         }
 
         /**
@@ -116,29 +137,6 @@ public class Accordion extends LinearLayout {
          */
         public LinearLayout getHeader() {
             return m_panelHeader;
-        }
-
-        /**
-         * Sets the panel layout child container to the view specified.
-         *
-         * @param view The view to set as the child container for the panel
-         */
-        public void setPanelView(View view) {
-            // Add the specified view to the panel layout.
-            getLayout().addView(view, new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            m_panelView = view;
-        }
-
-        /**
-         * Getter for the panel child container.
-         *
-         * @return The panel child container.
-         */
-        public View getPanelView() {
-            return m_panelView;
         }
 
         /**
@@ -166,6 +164,15 @@ public class Accordion extends LinearLayout {
          */
         public final int getPanelHeight() {
             return m_height;
+        }
+
+        /**
+         * Returns the panel view added to the layout.
+         *
+         * @return the panel view.
+         */
+        public View getPanelView() {
+            return m_panelLayout.getChildAt(0);
         }
 
         /**
@@ -198,7 +205,59 @@ public class Accordion extends LinearLayout {
             m_panelHeader.setBackgroundColor(Color.WHITE);
 
             m_active = false;
-            m_height = m_panelLayout.getHeight();
+            if (m_height > 0) {
+                m_height = m_panelLayout.getHeight();
+            }
+        }
+
+        /**
+         * Returns a value animator to collapse the specified panel.
+         *
+         * @return the value animator
+         */
+        private ValueAnimator collapse() {
+            final LinearLayout panelLayout = getLayout();
+            deactivate();
+
+            ValueAnimator hideLayout = ValueAnimator
+                    .ofInt(getPanelHeight(), 0)
+                    .setDuration(400);
+
+            // Animate collapsing the active tab.
+            hideLayout.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    panelLayout.getLayoutParams().height = (Integer)animation.getAnimatedValue();
+                    panelLayout.requestLayout();
+                }
+            });
+
+            return hideLayout;
+        }
+
+        /**
+         * Returns a value animator to expand the specified panel.
+         *
+         * @return the value animator
+         */
+        private ValueAnimator expand() {
+            final LinearLayout panelLayout = getLayout();
+            activate();
+
+            ValueAnimator showNewLayout = ValueAnimator
+                    .ofInt(0, getPanelHeight())
+                    .setDuration(400);
+
+            // Animate expanding the new tab.
+            showNewLayout.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    panelLayout.getLayoutParams().height = (Integer)animation.getAnimatedValue();
+                    panelLayout.requestLayout();
+                }
+            });
+
+            return showNewLayout;
         }
 
     }
@@ -209,11 +268,13 @@ public class Accordion extends LinearLayout {
      */
     private class PanelAnimator implements Animator.AnimatorListener {
 
-        private Panel m_panel;
+        private Panel m_closedPanel;
+        private Panel m_openedPanel;
 
-        private PanelAnimator(Panel panel) {
+        private PanelAnimator(Panel closedPanel, Panel openedPanel) {
             super();
-            m_panel = panel;
+            m_closedPanel = closedPanel;
+            m_openedPanel = openedPanel;
         }
 
         private void enableTouch() {
@@ -235,10 +296,16 @@ public class Accordion extends LinearLayout {
         @Override
         public void onAnimationEnd(Animator animation) {
             // Re-enable touch events.
-            m_panel.getLayout().setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
+            if (m_closedPanel != null) {
+                m_closedPanel.getLayout().removeAllViews();
+            }
+            if (m_openedPanel != null) {
+                m_openedPanel.getLayout().setLayoutParams(new LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ));
+                m_listener.onPanelExpanded(getPanelIndex(m_openedPanel));
+            }
             enableTouch();
         }
         @Override
@@ -267,6 +334,22 @@ public class Accordion extends LinearLayout {
         init(context);
     }
 
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("super_instance_state", super.onSaveInstanceState());
+        bundle.putInt("active_panel", m_activePanel);
+        return bundle;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        Bundle bundle = (Bundle)state;
+        setActivePanel(bundle.getInt("active_panel", 0));
+        state = bundle.getParcelable("super_instance_state");
+        super.onRestoreInstanceState(state);
+    }
+
     /**
      * Initializes the component on mount.
      *
@@ -278,6 +361,7 @@ public class Accordion extends LinearLayout {
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
         setOrientation(LinearLayout.VERTICAL);
+        m_activePanel = 0;
     }
 
     /**
@@ -292,10 +376,11 @@ public class Accordion extends LinearLayout {
     /**
      * Adds a panel to the collection of accordion panels.
      *
-     * @param panel The panel to add.
+     * @return the newly created panel.
      */
-    public void addPanel(final Panel panel) {
+    public Panel addPanel() {
         // Create a new panel instance.
+        final Panel panel = new Panel(getContext());
         LinearLayout panelHeader = panel.getHeader();
 
         // Bind click handler to toggle the panel.
@@ -303,27 +388,32 @@ public class Accordion extends LinearLayout {
             @Override
             public void onClick(View view) {
                 if (m_listener == null || m_listener.onHeaderClick(panel)) {
-                    setActivePanel(panel);
+                    setActivePanel(getPanelIndex(panel));
                 }
             }
         });
 
-        if (getChildCount() != 0) {
+        // Add the panel.
+        addView(panel, new RelativeLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT
+        ));
+
+        if (m_listener != null) {
+            panel.getLayout().addView(m_listener.getItem(getNumPanels() - 1));
+        }
+
+        if (getNumPanels() - 1 != m_activePanel) {
             // Deactivate and hide the panel.
             panel.deactivate();
             panel.setPadding(10, 0, 10, 10);
         } else {
             // The first panel is activated by default.
             panel.activate();
-            m_activePanel = 0;
             panel.setPadding(10, 10, 10, 10);
         }
 
-        // Add the panel.
-        addView(panel, new RelativeLayout.LayoutParams(
-            LayoutParams.MATCH_PARENT,
-            LayoutParams.WRAP_CONTENT
-        ));
+        return panel;
     }
 
     /**
@@ -349,48 +439,39 @@ public class Accordion extends LinearLayout {
     /**
      * Removes the specified panel.
      *
-     * @param panel The panel to remove.
+     * @param index The index of the panel to remove.
      */
-    public void removePanel(Panel panel) {
+    public void removePanel(int index) {
         if (getNumPanels() <= 1)
             return;
 
-        int panelIndex = getPanelIndex(panel);
-
         // Remove the panel references.
-        removeView(panel);
+        removeView(getPanel(index));
 
         // Update the active panel.
-        if (panelIndex == m_activePanel) {
+        if (index == m_activePanel) {
             // Expand the new active panel.
-            m_activePanel = Math.max(panelIndex - 1, 0);
+            m_activePanel = Math.max(index - 1, 0);
+            Panel panelToOpen = getPanel(m_activePanel);
 
-            AnimatorSet set = createSet(panel);
-            set.playTogether(expand(getPanel(m_activePanel)));
+            if (m_listener != null) {
+                panelToOpen.getLayout().addView(m_listener.getItem(m_activePanel));
+            }
+
+            AnimatorSet set = createSet(null, panelToOpen);
+            set.playTogether(panelToOpen.expand());
             set.start();
         }
     }
 
     /**
-     * Create an animator set for the specified panel.
-     *
-     * @param panel the panel to create a animator set for.
-     * @return The animator set.
-     */
-    private AnimatorSet createSet(Panel panel) {
-        AnimatorSet set = new AnimatorSet();
-        set.setInterpolator(new AccelerateDecelerateInterpolator());
-        set.addListener(new PanelAnimator(panel));
-        return set;
-    }
-
-    /**
      * Sets the active accordion panel to the view specified.
      *
-     * @param panel The accordion panel to activate.
+     * @param panelIndex The index of the accordion panel to activate.
      */
-    public void setActivePanel(final Panel panel) {
+    public void setActivePanel(final int panelIndex) {
         Panel activePanel = getPanel(m_activePanel);
+        Panel panel = getPanel(panelIndex);
 
         // No sense in toggling the same panel.
         if (activePanel == panel)
@@ -398,9 +479,38 @@ public class Accordion extends LinearLayout {
 
         m_activePanel = getPanelIndex(panel);
 
+        // If the height hasn't been calculated for either panel, use "activate" or
+        // "deactivate" rather than collapsing the panels with animations that rely
+        // on the height.
+        if (activePanel.getPanelHeight() == -1 || panel.getPanelHeight() == -1) {
+
+            if (activePanel.getPanelHeight() == -1 && panel.getPanelHeight() == -1) {
+                // Both heights haven't been computed yet, so deactivate and activate them.
+                activePanel.deactivate();
+                panel.activate();
+            } else if (activePanel.getPanelHeight() == -1) {
+                // Deactivate the active panel and expand the new panel.
+                activePanel.deactivate();
+                AnimatorSet set = createSet(null, panel);
+                set.playTogether(panel.expand());
+                set.start();
+            } else {
+                // Activate the new panel and collapse the old panel.
+                panel.activate();
+                AnimatorSet set = createSet(activePanel, null);
+                set.playTogether(activePanel.collapse());
+                set.start();
+            }
+            return;
+        }
+
+        if (m_listener != null) {
+            panel.getLayout().addView(m_listener.getItem(m_activePanel));
+        }
+
         // Play the animations together.
-        AnimatorSet set = createSet(panel);
-        set.playTogether(collapse(activePanel), expand(panel));
+        AnimatorSet set = createSet(activePanel, panel);
+        set.playTogether(activePanel.collapse(), panel.expand());
         set.start();
     }
 
@@ -416,68 +526,30 @@ public class Accordion extends LinearLayout {
     /**
      * Moves a panel to the specified index.
      *
-     * @param panel The panel to move.
-     * @param index The index to move it to.
+     * @param oldPosition The index of the panel to move.
+     * @param newPosition The index to move it to.
      */
-    public void movePanel(Panel panel, int index) {
-        int panelIndex = getPanelIndex(panel);
-        if (m_activePanel == panelIndex) {
-            m_activePanel = index;
+    public void movePanel(int oldPosition, int newPosition) {
+        if (m_activePanel == oldPosition) {
+            m_activePanel = newPosition;
         }
+        Panel panel = getPanel(oldPosition);
         removeView(panel);
-        addView(panel, index);
+        addView(panel, newPosition);
     }
 
     /**
-     * Returns a value animator to collapse the specified panel.
+     * Create an animator set for the specified panel.
      *
-     * @param panel the panel to collapse.
-     * @return the value animator
+     * @param panelToClose the panel to collapse.
+     * @param panelToOpen the panel to open.
+     * @return The animator set.
      */
-    private ValueAnimator collapse(Panel panel) {
-        final LinearLayout panelLayout = panel.getLayout();
-        panel.deactivate();
-
-        ValueAnimator hideLayout = ValueAnimator
-                .ofInt(panel.getPanelHeight(), 0)
-                .setDuration(400);
-
-        // Animate collapsing the active tab.
-        hideLayout.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                panelLayout.getLayoutParams().height = (Integer)animation.getAnimatedValue();
-                panelLayout.requestLayout();
-            }
-        });
-
-        return hideLayout;
-    }
-
-    /**
-     * Returns a value animator to expand the specified panel.
-     *
-     * @param panel the panel to expand.
-     * @return the value animator
-     */
-    private ValueAnimator expand(Panel panel) {
-        final LinearLayout panelLayout = panel.getLayout();
-        panel.activate();
-
-        ValueAnimator showNewLayout = ValueAnimator
-                .ofInt(0, panel.getPanelHeight())
-                .setDuration(400);
-
-        // Animate expanding the new tab.
-        showNewLayout.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                panelLayout.getLayoutParams().height = (Integer)animation.getAnimatedValue();
-                panelLayout.requestLayout();
-            }
-        });
-
-        return showNewLayout;
+    private AnimatorSet createSet(Panel panelToClose, Panel panelToOpen) {
+        AnimatorSet set = new AnimatorSet();
+        set.setInterpolator(new AccelerateDecelerateInterpolator());
+        set.addListener(new PanelAnimator(panelToClose, panelToOpen));
+        return set;
     }
 
     /**

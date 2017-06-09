@@ -1,5 +1,5 @@
 /*
- * Created by Mayank Sindwani on 2017-05-18.
+ * Created by Mayank Sindwani on 2017-06-06.
  *
  * This file is part of Handbook which is licensed under the
  * Apache License, Version 2.0. Full license details are
@@ -12,25 +12,21 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.Locale;
 
 /**
- * RequirementTable:
- * Defines the schema for requirements.
+ * ImageTable:
+ * Defines the schema for steps.
  */
 @SuppressWarnings("WeakerAccess")
-public class RequirementTable {
+public class ImageTable {
 
     // Table properties.
-    public static final String TABLE_NAME        = "requirements";
+    public static final String TABLE_NAME        = "images";
     public static final String COL_ID            = "_id";
-    public static final String COL_NAME          = "name";
-    public static final String COL_AMOUNT        = "amount";
-    public static final String COL_UNIT          = "unit";
-    public static final String COL_OPTIONAL      = "optional";
+    public static final String COL_URI           = "uri";
     public static final String COL_STEP_ID       = "step_id";
-    public static final int COL_NAME_MAX_LENGTH  = 100;
-    public static final int COL_UNIT_MAX_LENGTH  = 25;
+    public static final int COL_URI_MAX_LENGTH   = 100;
 
     /**
-     * Creates the requirements table
+     * Creates the images table
      *
      * @param db The database instance to execute against.
      */
@@ -49,29 +45,13 @@ public class RequirementTable {
                 String.format(
                         Locale.getDefault(),
                         "%s VARCHAR(%d) NOT NULL,",
-                        COL_NAME,
-                        COL_NAME_MAX_LENGTH
-                ) +
-                String.format(
-                        Locale.getDefault(),
-                        "%s REAL,",
-                        COL_AMOUNT
-                ) +
-                String.format(
-                        Locale.getDefault(),
-                        "%s VARCHAR(%d),",
-                        COL_UNIT,
-                        COL_UNIT_MAX_LENGTH
+                        COL_URI,
+                        COL_URI_MAX_LENGTH
                 ) +
                 String.format(
                         Locale.getDefault(),
                         "%s INTEGER NOT NULL,",
                         COL_STEP_ID
-                ) +
-                String.format(
-                        Locale.getDefault(),
-                        "%s INTEGER NOT NULL DEFAULT 0,",
-                        COL_OPTIONAL
                 ) +
                 String.format(
                         Locale.getDefault(),

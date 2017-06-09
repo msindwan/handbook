@@ -16,7 +16,6 @@ import org.jetbrains.annotations.Contract;
  * Requirement:
  * Represents the data in a requirement.
  */
-@SuppressWarnings("unused")
 public class Requirement implements Parcelable {
 
     private Boolean m_deleted;
