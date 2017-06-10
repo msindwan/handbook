@@ -119,8 +119,9 @@ public class TutorialEditor extends AppCompatActivity {
                 }
 
                 // Validate the tutorial steps.
-                for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
-                    step = m_tutorial.getStep(i);
+                ArrayList<Step> filteredSteps = m_tutorial.getActiveSteps();
+                for (int i = 0; i < filteredSteps.size(); i++) {
+                    step = filteredSteps.get(i);
                     if (StringHelper.isEmpty(step.getTitle())
                             || StringHelper.isEmpty(step.getInstructions())) {
                         m_accordion.setActivePanel(i + 1);
@@ -165,7 +166,7 @@ public class TutorialEditor extends AppCompatActivity {
                 // to be a clear way of passing data to the image selection intent.
                 stepView = (EditStepForm)
                         m_accordion.getPanel(m_accordion.getActivePanel()).getPanelView();
-                step = m_tutorial.getStep(m_accordion.getActivePanel() - 1);
+                step = stepView.getStep();
 
                 // Gather image uris.
                 ArrayList<Uri> images = new ArrayList<>();
@@ -256,6 +257,7 @@ public class TutorialEditor extends AppCompatActivity {
         Accordion.Panel panel = m_accordion.addPanel();
         panel.setTitle(getResources().getString(R.string.summary));
 
+
         // Add step views.
         for (int i = 0; i < m_tutorial.getNumSteps(); i++) {
             panel = m_accordion.addPanel();
@@ -296,8 +298,10 @@ public class TutorialEditor extends AppCompatActivity {
      * @param newIndex the index of the panel to swap with.
      */
     private void movePanel(int oldIndex, int newIndex) {
-        Step a = m_tutorial.getStep(oldIndex - 1);
-        Step b = m_tutorial.getStep(newIndex - 1);
+        ArrayList<Step> filteredSteps = m_tutorial.getActiveSteps();
+
+        Step a = filteredSteps.get(oldIndex - 1);
+        Step b = filteredSteps.get(newIndex - 1);
 
         m_accordion.movePanel(oldIndex, newIndex);
         m_tutorial.swapSteps(a.getIndex().intValue(), b.getIndex().intValue());
@@ -311,7 +315,9 @@ public class TutorialEditor extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             // Find the corresponding step index.
-            Step step = m_tutorial.getStep(m_accordion.getActivePanel() - 1);
+            Accordion.Panel panel = m_accordion.getPanel(m_accordion.getActivePanel());
+            EditStepForm stepView = (EditStepForm)panel.getPanelView();
+            Step step = stepView.getStep();
 
             // Remove the parent panel and its corresponding step.
             m_accordion.removePanel(m_accordion.getActivePanel());
@@ -548,10 +554,13 @@ public class TutorialEditor extends AppCompatActivity {
             }
 
             // Create a new step view.
+            ArrayList<Step> filteredSteps = m_tutorial.getActiveSteps();
             EditStepForm stepView = new EditStepForm(TutorialEditor.this);
-            Step step = m_tutorial.getStep(position - 1);
             RequirementListItem requirementItem;
+            Step step;
             int i;
+
+            step = filteredSteps.get(position - 1);
 
             // Bind arguments and listeners.
             stepView.setStep(step);

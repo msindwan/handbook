@@ -48,14 +48,10 @@
     <string name="unknown_error">An Unknown Error Occurred</string>
     <string name="add_image">Add Image</string>
     <string name="upload">Upload</string>
-    <string name="nth_step">
-        <xliff:g id="index">%d</xliff:g>/<xliff:g id="num_steps">%d</xliff:g>
-    </string>
     <string name="nth_step_no_title">
         Step <xliff:g id="index">%d</xliff:g>
     </string>
     <string name="nth_step_title">
         Step <xliff:g id="index">%d</xliff:g> : <xliff:g id="title">%s</xliff:g>
     </string>
-    <string name="play">Play</string>
 </resources>

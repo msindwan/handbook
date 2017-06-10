@@ -15,4 +15,5 @@
     <color name="colorAccent">#ad555a</color>
     <color name="colorSecondary">#ad555a</color>
     <color name="colorSecondaryAccent">#e28487</color>
+    <color name="colorGray">#dddddd</color>
 </resources>

@@ -7,56 +7,56 @@
  */
 package msindwan.handbook.views.tutorial.components;
 
-import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import msindwan.handbook.R;
+import msindwan.handbook.models.Requirement;
 import msindwan.handbook.models.Tutorial;
 
 /**
  * SummaryView:
  * Defines a view representing a tutorial's summary.
  */
-public class SummaryForm extends RelativeLayout {
+public class SummaryForm extends Fragment {
 
-    private LinearLayout m_requirementLayout;
-    private Tutorial m_tutorial;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.tutorial_viewer_summary_panel, container, false);
+        Bundle arguments = getArguments();
 
-    // Constructors.
-    public SummaryForm(Context context, Tutorial tutorial, View tag) {
-        super(context);
-        m_tutorial = tutorial;
-        setTag(tag);
-        init(context);
-    }
+        // If a tutorial is provided...
+        if (arguments != null && arguments.containsKey("tutorial")) {
+            Tutorial tutorial = getArguments().getParcelable("tutorial");
 
-    /**
-     * Initializes the component on mount.
-     *
-     * @param context The initialization context.
-     */
-    private void init(Context context) {
-        inflate(context, R.layout.tutorial_viewer_summary_panel, this);
-        TextView name = (TextView) findViewById(R.id.tutorial_viewer_name);
-        TextView description = (TextView) findViewById(R.id.tutorial_viewer_description);
-        m_requirementLayout = (LinearLayout) findViewById(R.id.tutorial_viewer_requirements);
+            if (tutorial != null) {
+                // Mount components.
+                TextView description = (TextView)
+                        view.findViewById(R.id.tutorial_viewer_description);
+                LinearLayout requirements = (LinearLayout)
+                        view.findViewById(R.id.tutorial_viewer_requirements);
+                TextView requirementPlaceholder = (TextView)
+                        view.findViewById(R.id.tutorial_viewer_requirement_placeholder);
 
-        name.setText(m_tutorial.getName());
-        description.setText(m_tutorial.getDescription());
-    }
+                // Set the description.
+                description.setText(tutorial.getDescription());
 
-    /**
-     * Adds a requirement list item to the layout.
-     *
-     * @param item the item to add.
-     */
-    public void addRequirementListItem(RequirementListItem item) {
-        TextView requirementPlaceholder = (TextView)
-                findViewById(R.id.tutorial_viewer_requirement_placeholder);
-        requirementPlaceholder.setVisibility(View.GONE);
-        m_requirementLayout.addView(item);
+                // Render all of the requirements.
+                for (Requirement requirement : tutorial.getAllRequirements()) {
+                    requirementPlaceholder.setVisibility(View.GONE);
+                    RequirementListItem item = new RequirementListItem(getContext());
+                    item.setRequirement(requirement);
+                    item.toggleDeleteButton(false);
+                    requirements.addView(item);
+                }
+            }
+        }
+        return view;
     }
 }

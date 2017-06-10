@@ -274,4 +274,20 @@ public class Tutorial implements Parcelable {
         return requirements.values();
     }
 
+    /**
+     * Filters out deleted steps.
+     *
+     * @return the filtered set of steps.
+     */
+    public ArrayList<Step> getActiveSteps() {
+        ArrayList<Step> filteredSteps = new ArrayList<>();
+        // Filter out deleted steps.
+        for (int i = 0; i < getNumSteps(); i++) {
+            if (!getStep(i).isDeleted()) {
+                filteredSteps.add(getStep(i));
+            }
+        }
+        return filteredSteps;
+    }
+
 }
