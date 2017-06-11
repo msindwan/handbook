@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
@@ -163,10 +164,10 @@ public class FileUploader extends RelativeLayout {
         /**
          * The uri to set as the preview.
          *
-         * @param uri The uri to set.
+         * @param drawable The drawable to set.
          */
-        public void setPreview(String uri) {
-            m_thumbnail.setImageURI(Uri.parse(uri));
+        public void setPreview(Drawable drawable) {
+            m_thumbnail.setImageDrawable(drawable);
             crossFadeThumbnail();
         }
 

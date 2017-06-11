@@ -13,9 +13,11 @@ import android.content.Intent;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,7 +27,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -612,23 +613,40 @@ public class TutorialEditor extends AppCompatActivity {
                 if (!image.isDeleted()) {
                     // Read each image.
                     final int itemIndex = j;
+
                     j++;
                     try {
                         image.read(image.getImageURI(), getContentResolver());
-                        final Bitmap thumbnail = image.getThumbnail(getContentResolver(), 64, 64);
+                        final Bitmap finalThumbnail = image.getThumbnail(
+                                getContentResolver(), 64, 64);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 // Set the thumbnail for each item.
                                 FileUploader.FileUploaderItem item;
                                 item = m_stepView.getUploaderItem(itemIndex);
-                                item.setPreview(thumbnail);
+                                item.setPreview(finalThumbnail);
                                 item.setTitle(image.getName());
                                 item.setSubtitle(String.format(Locale.getDefault(), "%d KB", image.getSize()));
                             }
                         });
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (Exception e) {
+                        Log.e(getResources().getString(R.string.app_name), "exception", e);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Set the drawable for each item.
+                                Drawable brokenImage = ContextCompat.getDrawable(
+                                    TutorialEditor.this,
+                                    R.mipmap.ic_broken_image_black_24dp
+                                );
+                                FileUploader.FileUploaderItem item;
+                                item = m_stepView.getUploaderItem(itemIndex);
+                                item.setPreview(brokenImage);
+                                item.setTitle(getResources().getString(R.string.broken_image));
+                                item.setSubtitle(String.format(Locale.getDefault(), "%d KB", image.getSize()));
+                            }
+                        });
                     }
                 }
             }

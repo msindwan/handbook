@@ -48,6 +48,7 @@
     <string name="unknown_error">An Unknown Error Occurred</string>
     <string name="add_image">Add Image</string>
     <string name="upload">Upload</string>
+    <string name="broken_image">Image not Available</string>
     <string name="nth_step_no_title">
         Step <xliff:g id="index">%d</xliff:g>
     </string>
