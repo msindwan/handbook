@@ -240,8 +240,9 @@ public class Image implements Parcelable {
      * @param image The uri of the image to read.
      * @param resolver he content resolver to read from.
      * @throws IOException if the image cannot be read.
+     * @throws SecurityException if the file cannot be accessed.
      */
-    public void read(Uri image, ContentResolver resolver) throws IOException {
+    public void read(Uri image, ContentResolver resolver) throws IOException, SecurityException {
         long dataSize = 0;
         String[] filePathColumn = {
                 MediaStore.Images.Media.DISPLAY_NAME
