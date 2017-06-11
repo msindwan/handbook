@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2015.1.26)  31 MAY 2017 15:27
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2015.1.26)  11 JUN 2017 12:54
 entering extended mode
 **handbook.tex
 (C:\Projects\handbook\design\handbook.tex
@@ -327,28 +327,22 @@ been already used, duplicate ignored
                    \relax 
 l.55 \item T
             he system should allow users to perform CRUD operations on tutor...
-[1] <images/schema.pdf, id=60, 488.82625pt x 137.51375pt>
-File: images/schema.pdf Graphic file (type pdf)
-
-<use images/schema.pdf>
-Package pdftex.def Info: images/schema.pdf used on input line 71.
-(pdftex.def)             Requested size: 244.41252pt x 68.7567pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 77.
- [2 <C:/Projects/handbook/design/images/schema.pdf>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 77.
-
-(C:\Projects\handbook\design\handbook.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 77.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 77.
+[1]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 71.
+ [2]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 71.
+ (C:\Projects\handbook\design\handbook.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 71.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 71.
 Package rerunfilecheck Info: File `handbook.out' has not changed.
 (rerunfilecheck)             Checksum: E83D3402F9D21D1D86B722D5B88DAE81;468.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 77.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 71.
  ) 
 Here is how much of TeX's memory you used:
- 6095 strings out of 493921
- 91759 string characters out of 3146450
+ 6090 strings out of 493921
+ 91662 string characters out of 3146450
  174508 words of memory out of 3000000
- 9326 multiletter control sequences out of 15000+200000
+ 9322 multiletter control sequences out of 15000+200000
  8808 words of font info for 31 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
  29i,6n,28p,468b,419s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -356,9 +350,9 @@ Here is how much of TeX's memory you used:
 Program Files (x86)/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program
  Files (x86)/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files 
 (x86)/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on handbook.pdf (3 pages, 97464 bytes).
+Output written on handbook.pdf (3 pages, 68856 bytes).
 PDF statistics:
- 87 PDF objects out of 1000 (max. 8388607)
+ 83 PDF objects out of 1000 (max. 8388607)
  12 named destinations out of 1000 (max. 500000)
- 75 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 70 words of extra memory for PDF output out of 10000 (max. 10000000)
 
