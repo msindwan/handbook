@@ -5,7 +5,7 @@ following a set of steps by using the text-to-speech interface. Download [the la
     https://github.com/msindwan/handbook/releases).
 
 **By downloading the APK you agree to the [terms of use and privacy policy](
-    https://github.com/msindwan/handbook/wiki/Terms-of-Use-and-Privacy-Policy).**
+    https://github.com/msindwan/handbook/wiki/Terms-of-Use-and-Privacy-Policy)**
 
 ## License
 
